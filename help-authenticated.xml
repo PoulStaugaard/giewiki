@@ -1,0 +1,14 @@
+<?xml version="1.0" ?><document><storeArea><div viewTemplate="ViewOnlyTemplate" modified="20100731100819" modifier="Poul Staugaard" tags="help" title="Welcome" vercnt="1" version="1"><pre>Before you can start editing your new giewiki, you should examine,  possibly alter, and save various data for the root page. You do this via the PageProperties dialog:&lt;br&gt;
+</pre>
+</div>
+<div viewTemplate="ViewOnlyTemplate" modified="20100731100819" modifier="Poul Staugaard" tags="help" title="PagePropertiesHelp" vercnt="1" version="1"><pre>The data is:
+* ''Title &amp; Subtitle''&lt;br&gt;What is displayed at the top of the page and in the SiteMap, etc.
+* ''Owner''&lt;br&gt;Who controls the properties of this page. This would be your PenName, which initially is the same as your login name, but you can change it via the UserProfile.
+* ''Groups''&lt;br&gt;You may define a group (or multiple groups) of people that should have elevated access to the page.
+* ''Access permissions''&lt;br&gt;The level of access that various user classes should have to this page.
+* ''Template / Library includes''&lt;br&gt;Shows any page template or library resources that you include into this page.
+* ''Read-only options''&lt;br&gt;Various aspects of how the page looks to someone who does not have edit access:
+** ''Prior versions''&lt;br&gt;Allows the reader access to prior versions of a tiddler.
+** ''"view" button''&lt;br&gt;Allows the reader to see the "raw" text of a tiddler, including it's markup.
+
+	The page properties dialog is normally accessed via the edit menu, but on a still blank page it opens automatically (if you are logged in)</pre></div></storeArea><shadowArea/></document>

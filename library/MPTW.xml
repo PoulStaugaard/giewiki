@@ -1,0 +1,2077 @@
+﻿<!--
+this:	MPTW.xml 
+		MPTW version of "2010-09-15" - stripped to the core & patched for giewiki compatibility
+		Copyright (c) 2007-2008, Simon Baird
+		All rights reserved.
+license:http://mptw.tiddlyspot.com/#TheBSDLicense  
+-->
+<tiddlers>
+<div title="CloseOnCancelPlugin" modifier="MPTW" modified="201009151231" created="201004131209" tags="systemConfig">
+<pre>/***
+|Name:|CloseOnCancelPlugin|
+|Description:|Closes the tiddler if you click new tiddler then cancel. Default behaviour is to leave it open|
+|Version:|3.0.1 ($Rev: 3861 $)|
+|Date:|$Date: 2008-03-08 10:53:09 +1000 (Sat, 08 Mar 2008) $|
+|Source:|http://mptw.tiddlyspot.com/#CloseOnCancelPlugin|
+|Author:|Simon Baird &lt;simon.baird@gmail.com&gt;|
+|License:|http://mptw.tiddlyspot.com/#TheBSDLicense|
+***/
+//{{{
+merge(config.commands.cancelTiddler,{
+
+	handler_mptw_orig_closeUnsaved: config.commands.cancelTiddler.handler,
+
+	handler: function(event,src,title) {
+		this.handler_mptw_orig_closeUnsaved(event,src,title);
+		if (!story.isDirty(title) &amp;&amp; !store.tiddlerExists(title) &amp;&amp; !store.isShadowTiddler(title))
+			story.closeTiddler(title,true);
+		return false;
+	}
+
+});
+
+//}}}
+
+</pre>
+</div>
+<div title="ExtendTagButtonPlugin" modifier="MPTW" modified="201009151231" created="201004041418" tags="systemConfig">
+<pre>/***
+|Name:|ExtentTagButtonPlugin|
+|Description:|Adds a New tiddler button in the tag drop down|
+|Version:|3.2 ($Rev: 3861 $)|
+|Date:|$Date: 2008-03-08 10:53:09 +1000 (Sat, 08 Mar 2008) $|
+|Source:|http://mptw.tiddlyspot.com/#ExtendTagButtonPlugin|
+|Author:|Simon Baird &lt;simon.baird@gmail.com&gt;|
+|License|http://mptw.tiddlyspot.com/#TheBSDLicense|
+***/
+//{{{
+
+window.onClickTag_mptw_orig = window.onClickTag;
+window.onClickTag = function(e) {
+	window.onClickTag_mptw_orig.apply(this,arguments);
+	var tag = this.getAttribute(&quot;tag&quot;);
+	var title = this.getAttribute(&quot;tiddler&quot;);
+	// Thanks Saq, you're a genius :)
+	var popup = Popup.stack[Popup.stack.length-1].popup;
+	createTiddlyElement(createTiddlyElement(popup,&quot;li&quot;,null,&quot;listBreak&quot;),&quot;div&quot;);
+	wikify(&quot;&lt;&lt;newTiddler label:'New tiddler' tag:'&quot;+tag+&quot;'&gt;&gt;&quot;,createTiddlyElement(popup,&quot;li&quot;));
+	return false;
+}
+
+//}}}
+
+</pre>
+</div>
+<div title="HideWhenPlugin" modifier="MPTW" modified="201009151231" created="201004041418" tags="systemConfig">
+<pre>/***
+|Name:|HideWhenPlugin|
+|Description:|Allows conditional inclusion/exclusion in templates|
+|Version:|3.1 ($Rev: 3919 $)|
+|Date:|$Date: 2008-03-13 02:03:12 +1000 (Thu, 13 Mar 2008) $|
+|Source:|http://mptw.tiddlyspot.com/#HideWhenPlugin|
+|Author:|Simon Baird &lt;simon.baird@gmail.com&gt;|
+|License:|http://mptw.tiddlyspot.com/#TheBSDLicense|
+For use in ViewTemplate and EditTemplate. Example usage:
+{{{&lt;div macro=&quot;showWhenTagged Task&quot;&gt;[[TaskToolbar]]&lt;/div&gt;}}}
+{{{&lt;div macro=&quot;showWhen tiddler.modifier == 'BartSimpson'&quot;&gt;&lt;img src=&quot;bart.gif&quot;/&gt;&lt;/div&gt;}}}
+***/
+//{{{
+
+window.hideWhenLastTest = false;
+
+window.removeElementWhen = function(test,place) {
+	window.hideWhenLastTest = test;
+	if (test) {
+		removeChildren(place);
+		place.parentNode.removeChild(place);
+	}
+};
+
+
+merge(config.macros,{
+
+	hideWhen: { handler: function(place,macroName,params,wikifier,paramString,tiddler) {
+		removeElementWhen( eval(paramString), place);
+	}},
+
+	showWhen: { handler: function(place,macroName,params,wikifier,paramString,tiddler) {
+		removeElementWhen( !eval(paramString), place);
+	}},
+
+	hideWhenTagged: { handler: function (place,macroName,params,wikifier,paramString,tiddler) {
+		removeElementWhen( tiddler.tags.containsAll(params), place);
+	}},
+
+	showWhenTagged: { handler: function (place,macroName,params,wikifier,paramString,tiddler) {
+		removeElementWhen( !tiddler.tags.containsAll(params), place);
+	}},
+
+	hideWhenTaggedAny: { handler: function (place,macroName,params,wikifier,paramString,tiddler) {
+		removeElementWhen( tiddler.tags.containsAny(params), place);
+	}},
+
+	showWhenTaggedAny: { handler: function (place,macroName,params,wikifier,paramString,tiddler) {
+		removeElementWhen( !tiddler.tags.containsAny(params), place);
+	}},
+
+	hideWhenTaggedAll: { handler: function (place,macroName,params,wikifier,paramString,tiddler) {
+		removeElementWhen( tiddler.tags.containsAll(params), place);
+	}},
+
+	showWhenTaggedAll: { handler: function (place,macroName,params,wikifier,paramString,tiddler) {
+		removeElementWhen( !tiddler.tags.containsAll(params), place);
+	}},
+
+	hideWhenExists: { handler: function(place,macroName,params,wikifier,paramString,tiddler) {
+		removeElementWhen( store.tiddlerExists(params[0]) || store.isShadowTiddler(params[0]), place);
+	}},
+
+	showWhenExists: { handler: function(place,macroName,params,wikifier,paramString,tiddler) {
+		removeElementWhen( !(store.tiddlerExists(params[0]) || store.isShadowTiddler(params[0])), place);
+	}},
+
+	hideWhenTitleIs: { handler: function(place,macroName,params,wikifier,paramString,tiddler) {
+		removeElementWhen( tiddler.title == params[0], place);
+	}},
+
+	showWhenTitleIs: { handler: function(place,macroName,params,wikifier,paramString,tiddler) {
+		removeElementWhen( tiddler.title != params[0], place);
+	}},
+
+	'else': { handler: function(place,macroName,params,wikifier,paramString,tiddler) {
+		removeElementWhen( !window.hideWhenLastTest, place);
+	}}
+
+});
+
+//}}}
+
+</pre>
+</div>
+<div title="InstantTimestampPlugin" modifier="MPTW" modified="201009151231" created="201004041418" tags="systemConfig">
+<pre>/***
+|Name:|InstantTimestampPlugin|
+|Description:|A handy way to insert timestamps in your tiddler content|
+|Version:|1.0.10 ($Rev: 3646 $)|
+|Date:|$Date: 2008-02-27 02:34:38 +1000 (Wed, 27 Feb 2008) $|
+|Source:|http://mptw.tiddlyspot.com/#InstantTimestampPlugin|
+|Author:|Simon Baird &lt;simon.baird@gmail.com&gt;|
+|License:|http://mptw.tiddlyspot.com/#TheBSDLicense|
+!!Usage
+If you enter {ts} in your tiddler content (without the spaces) it will be replaced with a timestamp when you save the tiddler. Full list of formats:
+* {ts} or {t} -&gt; timestamp
+* {ds} or {d} -&gt; datestamp
+* !ts or !t at start of line -&gt; !!timestamp
+* !ds or !d at start of line -&gt; !!datestamp
+(I added the extra ! since that's how I like it. Remove it from translations below if required)
+!!Notes
+* Change the timeFormat and dateFormat below to suit your preference.
+* See also http://mptw2.tiddlyspot.com/#AutoCorrectPlugin
+* You could invent other translations and add them to the translations array below.
+***/
+//{{{
+
+config.InstantTimestamp = {
+
+	// adjust to suit
+	timeFormat: 'DD/0MM/YY 0hh:0mm',
+	dateFormat: 'DD/0MM/YY',
+
+	translations: [
+		[/^!ts?$/img,  &quot;'!!{{ts{'+now.formatString(config.InstantTimestamp.timeFormat)+'}}}'&quot;],
+		[/^!ds?$/img,  &quot;'!!{{ds{'+now.formatString(config.InstantTimestamp.dateFormat)+'}}}'&quot;],
+
+		// thanks Adapted Cat
+		[/\{ts?\}(?!\}\})/ig,&quot;'{{ts{'+now.formatString(config.InstantTimestamp.timeFormat)+'}}}'&quot;],
+		[/\{ds?\}(?!\}\})/ig,&quot;'{{ds{'+now.formatString(config.InstantTimestamp.dateFormat)+'}}}'&quot;]
+		
+	],
+
+	excludeTags: [
+		&quot;noAutoCorrect&quot;,
+		&quot;noTimestamp&quot;,
+		&quot;html&quot;,
+		&quot;CSS&quot;,
+		&quot;css&quot;,
+		&quot;systemConfig&quot;,
+		&quot;systemConfigDisabled&quot;,
+		&quot;zsystemConfig&quot;,
+		&quot;Plugins&quot;,
+		&quot;Plugin&quot;,
+		&quot;plugins&quot;,
+		&quot;plugin&quot;,
+		&quot;javascript&quot;,
+		&quot;code&quot;,
+		&quot;systemTheme&quot;,
+		&quot;systemPalette&quot;
+	],
+
+	excludeTiddlers: [
+		&quot;StyleSheet&quot;,
+		&quot;StyleSheetLayout&quot;,
+		&quot;StyleSheetColors&quot;,
+		&quot;StyleSheetPrint&quot;
+		// more?
+	]
+
+}; 
+
+TiddlyWiki.prototype.saveTiddler_mptw_instanttimestamp = TiddlyWiki.prototype.saveTiddler;
+TiddlyWiki.prototype.saveTiddler = function(title,newTitle,newBody,modifier,modified,atags,fields,clearChangeCount,created) {
+
+	var tags = atags ? atags : []; // just in case atags is null
+	tags = (typeof(tags) == &quot;string&quot;) ? tags.readBracketedList() : tags;
+	var conf = config.InstantTimestamp;
+
+	if ( !tags.containsAny(conf.excludeTags) &amp;&amp; !conf.excludeTiddlers.contains(newTitle) ) {
+
+		var now = new Date();
+		var trans = conf.translations;
+		for (var i=0;i&lt;trans.length;i++) {
+			newBody = newBody.replace(trans[i][0], eval(trans[i][1]));
+		}
+	}
+
+	// TODO: use apply() instead of naming all args?
+	return this.saveTiddler_mptw_instanttimestamp(title,newTitle,newBody,modifier,modified,atags,fields,clearChangeCount,created);
+}
+
+// you can override these in StyleSheet 
+setStylesheet(&quot;.ts,.ds { font-style:italic; }&quot;,&quot;instantTimestampStyles&quot;);
+
+//}}}
+
+</pre>
+</div>
+<div title="MPTW" modifier="MPTW" modified="201009151231" created="201004041418">
+<pre>MPTW is a distribution or edition of TiddlyWiki that includes a standard TiddlyWiki core packaged with some plugins designed to improve usability and provide a better way to organise your information. For more information see http://mptw.tiddlyspot.com/.
+</pre>
+</div>
+<div title="MptwBlack" modifier="MPTW" modified="201009151231" created="201004041423" tags="systemPalette">
+<pre>Name: MptwBlack
+Background: #000
+Foreground: #fff
+PrimaryPale: #333
+PrimaryLight: #555
+PrimaryMid: #888
+PrimaryDark: #aaa
+SecondaryPale: #111
+SecondaryLight: #222
+SecondaryMid: #555
+SecondaryDark: #888
+TertiaryPale: #222
+TertiaryLight: #666
+TertiaryMid: #888
+TertiaryDark: #aaa
+Error: #300
+
+</pre>
+</div>
+<div title="MptwBlue" modifier="MPTW" modified="201009151231" created="201004041418" tags="systemPalette">
+<pre>Name: MptwBlue
+Background: #fff
+Foreground: #000
+PrimaryPale: #cdf
+PrimaryLight: #57c
+PrimaryMid: #114
+PrimaryDark: #012
+SecondaryPale: #ffc
+SecondaryLight: #fe8
+SecondaryMid: #db4
+SecondaryDark: #841
+TertiaryPale: #eee
+TertiaryLight: #ccc
+TertiaryMid: #999
+TertiaryDark: #666
+Error: #f88
+
+</pre>
+</div>
+<div title="MptwCollapsePlugin" modifier="MPTW" modified="201009151231" created="201004041418" tags="systemConfig">
+<pre>
+(function($){
+
+merge(config.macros,{
+	mptwCollapse: {
+		handler: function(place,macroName,params) {
+			createTiddlyButton(place, params[0] == '+' ? '\u25AD' : '\u25AC', 'collapse/uncollapse', function(){
+				$(story.findContainingTiddler(place)).toggleClass('collapsed');
+			});
+		}
+	}
+});
+
+/* this doesn't work unless you have a modified ViewTempate */
+config.shadowTiddlers[&quot;MptwCollapsePluginStyles&quot;] = &quot;&quot;
+	+&quot;.collapsed .uncollapsedView { display:none;       }&quot;
+	+&quot;.collapsedView              { display:none;       }&quot;
+	+&quot;.collapsed .collapsedView   { display:block;      }&quot;
+	+&quot;.tiddler.collapsed          { padding-bottom:1em; }&quot;
+	+&quot;.tiddler.collapsed .title   { font-size:100%;     }&quot;
+;
+
+store.addNotification(&quot;MptwCollapsePluginStyles&quot;,refreshStyles);
+
+})(jQuery);
+</pre>
+</div>
+<div title="MptwConfigPlugin" modifier="MPTW" modified="201009151231" created="201005122149" tags="systemConfig">
+<pre>/***
+|Name:|MptwConfigPlugin|
+|Description:|Miscellaneous tweaks used by MPTW|
+|Version:|1.0 ($Rev: 3646 $)|
+|Requires script:|jQuery|
+|Date:|$Date: 2008-02-27 02:34:38 +1000 (Wed, 27 Feb 2008) $|
+|Source:|http://mptw.tiddlyspot.com/#MptwConfigPlugin|
+|Author:|Simon Baird &lt;simon.baird@gmail.com&gt;|
+|License:|http://mptw.tiddlyspot.com/#MptwConfigPlugin|
+!!Note: instead of editing this you should put overrides in MptwUserConfigPlugin
+***/
+//{{{
+config.options.chkHttpReadOnly = false; 		// means web visitors can experiment with your site by clicking edit
+
+config.options.chkInsertTabs = true;    		// tab inserts a tab when editing a tiddler
+config.views.wikified.defaultText = &quot;&quot;;			// don't need message when a tiddler doesn't exist
+config.views.editor.defaultText = &quot;&quot;;			// don't need message when creating a new tiddler 
+
+config.options.chkSaveBackups = true;			// do save backups
+config.options.txtBackupFolder = 'twbackup';	// put backups in a backups folder
+
+config.options.chkAutoSave = (window.location.protocol == &quot;file:&quot;); // do autosave if we're in local file
+
+config.mptwVersion = &quot;2.5.3&quot;;
+
+config.macros.mptwVersion={handler:function(place){wikify(config.mptwVersion,place);}};
+
+if (config.options.txtTheme == '')
+	config.options.txtTheme = 'MptwTheme';
+
+// add to default GettingStarted
+config.shadowTiddlers.GettingStarted += &quot;\n\nSee also [[MPTW]].&quot;;
+
+// add select theme and palette controls in default OptionsPanel
+config.shadowTiddlers.OptionsPanel = config.shadowTiddlers.OptionsPanel.replace(/(\n\-\-\-\-\nAlso see \[\[AdvancedOptions\]\])/, &quot;{{select{&lt;&lt;selectTheme&gt;&gt;\n&lt;&lt;selectPalette&gt;&gt;}}}$1&quot;);
+
+// these are used by ViewTemplate
+config.mptwDateFormat = 'DD/MM/YY';
+config.mptwJournalFormat = 'Journal DD/MM/YY';
+
+//}}}
+</pre>
+</div>
+<div title="MptwGreen" modifier="MPTW" modified="201009151231" created="201004041418" tags="systemPalette">
+<pre>Name: MptwGreen
+Background: #fff
+Foreground: #000
+PrimaryPale: #9b9
+PrimaryLight: #385
+PrimaryMid: #031
+PrimaryDark: #020
+SecondaryPale: #ffc
+SecondaryLight: #fe8
+SecondaryMid: #db4
+SecondaryDark: #841
+TertiaryPale: #eee
+TertiaryLight: #ccc
+TertiaryMid: #999
+TertiaryDark: #666
+Error: #f88
+
+</pre>
+</div>
+<div title="MptwRed" modifier="MPTW" modified="201009151231" created="201004041418" tags="systemPalette">
+<pre>Name: MptwRed
+Background: #fff
+Foreground: #000
+PrimaryPale: #eaa
+PrimaryLight: #c55
+PrimaryMid: #711
+PrimaryDark: #500
+SecondaryPale: #ffc
+SecondaryLight: #fe8
+SecondaryMid: #db4
+SecondaryDark: #841
+TertiaryPale: #eee
+TertiaryLight: #ccc
+TertiaryMid: #999
+TertiaryDark: #666
+Error: #f88
+
+</pre>
+</div>
+<div title="MptwRoundTheme" modifier="MPTW" modified="201009151231" created="201004041418" tags="systemTheme">
+<pre>|Name|MptwRounded|
+|Description|Mptw Theme with some rounded corners (Firefox only)|
+|ViewTemplate|MptwTheme##ViewTemplate|
+|EditTemplate|MptwTheme##EditTemplate|
+|PageTemplate|MptwTheme##PageTemplate|
+|StyleSheet|##StyleSheet|
+
+!StyleSheet
+/*{{{*/
+
+[[MptwTheme##StyleSheet]]
+
+.tiddler,
+.sliderPanel,
+.button,
+.tiddlyLink,
+.tabContents
+{ -moz-border-radius: 1em; }
+
+.tab {
+	-moz-border-radius-topleft: 0.5em;
+	-moz-border-radius-topright: 0.5em;
+}
+#topMenu {
+	-moz-border-radius-bottomleft: 2em;
+	-moz-border-radius-bottomright: 2em;
+}
+
+/*}}}*/
+
+</pre>
+</div>
+<div title="MptwSmoke" modifier="MPTW" modified="201009151231" created="201004041418" tags="systemPalette">
+<pre>Name: MptwSmoke
+Background: #fff
+Foreground: #000
+PrimaryPale: #aaa
+PrimaryLight: #777
+PrimaryMid: #111
+PrimaryDark: #000
+SecondaryPale: #ffc
+SecondaryLight: #fe8
+SecondaryMid: #db4
+SecondaryDark: #841
+TertiaryPale: #eee
+TertiaryLight: #ccc
+TertiaryMid: #999
+TertiaryDark: #666
+Error: #f88
+
+</pre>
+</div>
+<div title="MptwStandardTheme" modifier="MPTW" modified="201009151231" created="201004041418" tags="systemTheme">
+<pre>|Name|MptwStandard|
+|Description|Mptw Theme with the default TiddlyWiki PageLayout and Styles|
+|ViewTemplate|MptwTheme##ViewTemplate|
+|EditTemplate|MptwTheme##EditTemplate|
+</pre>
+</div>
+<div title="MptwTeal" modifier="MPTW" modified="201009151231" created="201004041418" tags="systemPalette">
+<pre>Name: MptwTeal
+Background: #fff
+Foreground: #000
+PrimaryPale: #B5D1DF
+PrimaryLight: #618FA9
+PrimaryMid: #1a3844
+PrimaryDark: #000
+SecondaryPale: #ffc
+SecondaryLight: #fe8
+SecondaryMid: #db4
+SecondaryDark: #841
+TertiaryPale: #f8f8f8
+TertiaryLight: #bbb
+TertiaryMid: #999
+TertiaryDark: #888
+Error: #f88
+</pre>
+</div>
+<div title="MptwTheme" modifier="MPTW" modified="201009151231" created="201005122154" tags="systemTheme">
+<pre>|Name|MptwTheme|
+|Description|Mptw Theme including custom PageLayout|
+|Modified|Added comments div|
+|PageTemplate|##PageTemplate|
+|ViewTemplate|##ViewTemplate|
+|EditTemplate|##EditTemplate|
+|StyleSheet|##StyleSheet|
+
+http://mptw.tiddlyspot.com/#MptwTheme ($Rev: 1829 $)
+
+!PageTemplate
+&lt;!--{{{--&gt;
+&lt;div class='header' macro='gradient vert [[ColorPalette::PrimaryLight]] [[ColorPalette::PrimaryMid]]'&gt;
+	&lt;div class='headerForeground'&gt;
+		&lt;span class='siteTitle' refresh='content' tiddler='SiteTitle'&gt;&lt;/span&gt;&amp;nbsp;
+		&lt;span class='siteSubtitle' refresh='content' tiddler='SiteSubtitle'&gt;&lt;/span&gt;
+	&lt;/div&gt;
+&lt;/div&gt;
+&lt;!-- horizontal MainMenu --&gt;
+&lt;div id='topMenu' refresh='content' tiddler='MainMenu'&gt;&lt;/div&gt;
+&lt;!-- original MainMenu menu --&gt;
+&lt;!-- &lt;div id='mainMenu' refresh='content' tiddler='MainMenu'&gt;&lt;/div&gt; --&gt;
+&lt;div id='sidebar'&gt;
+	&lt;div id='sidebarOptions' refresh='content' tiddler='SideBarOptions'&gt;&lt;/div&gt;
+	&lt;div id='sidebarTabs' refresh='content' force='true' tiddler='SideBarTabs'&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id='displayArea'&gt;
+	&lt;div id='messageArea'&gt;&lt;/div&gt;
+	&lt;div id='tiddlerDisplay'&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;!--}}}--&gt;
+
+!ViewTemplate
+&lt;!--{{{--&gt;
+&lt;div class=&quot;uncollapsedView&quot;&gt;
+[[MptwTheme##ViewTemplateToolbar]]
+
+&lt;div class=&quot;tagglyTagged&quot; macro=&quot;tags&quot;&gt;&lt;/div&gt;
+
+&lt;div class='titleContainer'&gt;
+	&lt;span class='title' macro='view title'&gt;&lt;/span&gt;
+	&lt;span macro=&quot;miniTag&quot;&gt;&lt;/span&gt;
+&lt;/div&gt;
+
+&lt;div class='subtitle'&gt;
+	(updated &lt;span macro='view modified date {{config.mptwDateFormat?config.mptwDateFormat:&quot;MM/0DD/YY&quot;}}'&gt;&lt;/span&gt;
+	by &lt;span macro='view modifier link'&gt;&lt;/span&gt;) &lt;span macro='history'&gt;&lt;/span&gt;
+	&lt;!--
+	(&lt;span macro='message views.wikified.createdPrompt'&gt;&lt;/span&gt;
+	&lt;span macro='view created date {{config.mptwDateFormat?config.mptwDateFormat:&quot;MM/0DD/YY&quot;}}'&gt;&lt;/span&gt;)
+	--&gt;
+&lt;/div&gt;
+
+&lt;div class='viewer' macro='view versions wikified'&gt;&lt;/div&gt;
+&lt;div macro=&quot;showWhen tiddler.tags.containsAny(['css','html','pre','systemConfig']) &amp;&amp; !tiddler.text.match('{{'+'{')&quot;&gt;
+	&lt;div class='viewer'&gt;&lt;pre macro='view text'&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div macro=&quot;else&quot;&gt;
+	&lt;div class='viewer' macro='view text wikified'&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;tagglyTagging&quot; macro=&quot;tagglyTagging&quot;&gt;&lt;/div&gt;
+&lt;div class=&quot;comments&quot; macro=&quot;comments&quot;&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;collapsedView&quot;&gt;
+	&lt;span class='toolbar'&gt;
+		&lt;span macro='toolbar closeTiddler'&gt;&lt;/span&gt;
+		&lt;span macro='mptwCollapse +'&gt;&lt;/span&gt;
+	&lt;/span&gt;
+	&lt;span class='title' macro='view title'&gt;&lt;/span&gt;
+&lt;/div&gt;
+
+&lt;!--}}}--&gt;
+
+!ViewTemplateToolbar
+&lt;!--{{{--&gt;
+&lt;div class='toolbar'&gt;
+	&lt;span macro=&quot;showWhenTagged systemConfig&quot;&gt;
+		&lt;span macro=&quot;toggleTag systemConfigDisable . '[[disable|systemConfigDisable]]'&quot;&gt;&lt;/span&gt;
+	&lt;/span&gt;
+	&lt;span macro=&quot;showWhenTagged systemTheme&quot;&gt;&lt;span macro=&quot;applyTheme&quot;&gt;&lt;/span&gt;&lt;/span&gt;
+	&lt;span macro=&quot;showWhenTagged systemPalette&quot;&gt;&lt;span macro=&quot;applyPalette&quot;&gt;&lt;/span&gt;&lt;/span&gt;
+	&lt;span macro=&quot;showWhen tiddler.tags.contains('css') || tiddler.title == 'StyleSheet'&quot;&gt;&lt;span macro=&quot;refreshAll&quot;&gt;&lt;/span&gt;&lt;/span&gt;
+	&lt;span style=&quot;padding:1em;&quot;&gt;&lt;/span&gt;
+	&lt;span macro='toolbar closeTiddler closeOthers +editTiddler deleteTiddler &gt; fields syncing permalink references jump'&gt;&lt;/span&gt; &lt;span macro='newHere label:&quot;new here&quot;'&gt;&lt;/span&gt;
+	&lt;span macro='newJournalHere {{config.mptwJournalFormat?config.mptwJournalFormat:&quot;MM/0DD/YY&quot;}}'&gt;&lt;/span&gt;
+	&lt;!--span macro='mptwCollapse -'&gt;&lt;/span--&gt;
+&lt;/div&gt;
+&lt;!--}}}--&gt;
+
+!EditTemplate
+&lt;!--{{{--&gt;
+&lt;div class='toolbar' macro='toolbar toolbar +saveTiddler saveCloseTiddler closeOthers -cancelTiddler cancelCloseTiddler lockTiddler deleteTiddler revertTiddler truncateTiddler'&gt;&lt;/div&gt;
+&lt;div class='title' macro='view title'&gt;&lt;/div&gt;
+&lt;fieldset&gt;&lt;legend&gt;Title&lt;/legend&gt;&lt;div class='editor' macro='edit title'&gt;&lt;/div&gt;&lt;/fieldset&gt;
+&lt;div macro='annotations'&gt;&lt;/div&gt;
+&lt;fieldset&gt;&lt;legend&gt;Text&lt;/legend&gt;&lt;div class='editor' macro='edit text'&gt;&lt;/div&gt;
+&lt;table style='width:100%;'&gt;&lt;tr&gt;&lt;td&gt;&lt;div class='commentToolbar' macro='toolbar [[ToolbarCommands::TextToolbar]]'&gt;&lt;/td&gt;&lt;td align='right'&gt;&lt;div class='toolbar' macro='toolbar [[ToolbarCommands::EditToolbar]]'&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt; &lt;/fieldset&gt;
+&lt;fieldset id='preview' style='display:none'&gt;&lt;legend&gt;Preview&lt;/legend&gt;&lt;div class='preview' &gt;&lt;/div&gt;&lt;/fieldset&gt;
+&lt;fieldset id='tag' class='tagFrame'&gt;&lt;legend&gt;Tags&lt;/legend&gt;&lt;div class='editor' macro='edit tags'&gt;&lt;/div&gt;&lt;div class='editorFooter'&gt;&lt;span macro='message views.editor.tagPrompt'&gt;&lt;/span&gt;&lt;span macro='tagChooser'&gt;&lt;/span&gt;&lt;/div&gt;&lt;/fieldset&gt;
+&lt;!--}}}--&gt;
+
+!StyleSheet
+/*{{{*/
+
+/* a contrasting background so I can see where one tiddler ends and the other begins */
+body {
+	background: [[ColorPalette::TertiaryLight]];
+}
+
+/* sexy colours and font for the header */
+.headerForeground {
+	color: [[ColorPalette::PrimaryPale]];
+}
+.headerShadow, .headerShadow a {
+	color: [[ColorPalette::PrimaryMid]];
+}
+
+/* separate the top menu parts */
+.headerForeground, .headerShadow {
+	padding: 1em 1em 0;
+}
+
+.headerForeground, .headerShadow {
+	font-family: 'Trebuchet MS', sans-serif;
+	font-weight:bold;
+}
+.headerForeground .siteSubtitle {
+	color: [[ColorPalette::PrimaryLight]];
+}
+.headerShadow .siteSubtitle {
+	color: [[ColorPalette::PrimaryMid]];
+}
+
+/* make shadow go and down right instead of up and left */
+.headerShadow {
+	left: 1px;
+	top: 1px;
+}
+
+/* prefer monospace for editing */
+.editor textarea, .editor input {
+	font-family: 'Consolas', monospace;
+	background-color:[[ColorPalette::TertiaryPale]];
+}
+
+
+/* sexy tiddler titles */
+.title {
+	font-size: 250%;
+	color: [[ColorPalette::PrimaryLight]];
+	font-family: 'Trebuchet MS', sans-serif;
+}
+
+/* more subtle tiddler subtitle */
+.subtitle {
+	padding:0px;
+	margin:0px;
+	padding-left:1em;
+	font-size: 90%;
+	color: [[ColorPalette::TertiaryMid]];
+}
+.subtitle .tiddlyLink {
+	color: [[ColorPalette::TertiaryMid]];
+}
+
+/* a little bit of extra whitespace */
+.viewer {
+	padding-bottom:3px;
+}
+
+/* don't want any background color for headings */
+h1,h2,h3,h4,h5,h6 {
+	background-color: transparent;
+	color: [[ColorPalette::Foreground]];
+}
+
+/* give tiddlers 3d style border and explicit background */
+.tiddler {
+	background: [[ColorPalette::Background]];
+	border-right: 2px [[ColorPalette::TertiaryMid]] solid;
+	border-bottom: 2px [[ColorPalette::TertiaryMid]] solid;
+	margin-bottom: 1em;
+	padding:1em 2em 2em 1.5em;
+}
+
+/* make options slider look nicer */
+#sidebarOptions .sliderPanel {
+	border:solid 1px [[ColorPalette::PrimaryLight]];
+}
+
+/* the borders look wrong with the body background */
+#sidebar .button {
+	border-style: none;
+}
+
+/* this means you can put line breaks in SidebarOptions for readability */
+#sidebarOptions br {
+	display:none;
+}
+/* undo the above in OptionsPanel */
+#sidebarOptions .sliderPanel br {
+	display:inline;
+}
+
+/* horizontal main menu stuff */
+#displayArea {
+	margin: 1em 15.7em 0em 1em; /* use the freed up space */
+}
+#topMenu br {
+	display: none;
+}
+#topMenu {
+	background: [[ColorPalette::PrimaryMid]];
+	color:[[ColorPalette::PrimaryPale]];
+}
+#topMenu {
+	padding:2px;
+}
+#topMenu .button, #topMenu .tiddlyLink, #topMenu a {
+	margin-left: 0.5em;
+	margin-right: 0.5em;
+	padding-left: 3px;
+	padding-right: 3px;
+	color: [[ColorPalette::PrimaryPale]];
+	font-size: 115%;
+}
+#topMenu .button:hover, #topMenu .tiddlyLink:hover {
+	background: [[ColorPalette::PrimaryDark]];
+}
+
+/* make 2.2 act like 2.1 with the invisible buttons */
+.toolbar {
+	visibility:hidden;
+}
+.selected .toolbar {
+	visibility:visible;
+}
+
+/* experimental. this is a little borked in IE7 with the button 
+ * borders but worth it I think for the extra screen realestate */
+.toolbar { float:right; }
+
+/* fix for TaggerPlugin. from sb56637. improved by FND */
+.popup li .tagger a {
+   display:inline;
+}
+
+/* makes theme selector look a little better */
+#sidebarOptions .sliderPanel .select .button {
+  padding:0.5em;
+  display:block;
+}
+#sidebarOptions .sliderPanel .select br {
+	display:none;
+}
+
+/* make it print a little cleaner */
+@media print {
+	#topMenu {
+		display: none ! important;
+	}
+	/* not sure if we need all the importants */
+	.tiddler {
+		border-style: none ! important;
+		margin:0px ! important;
+		padding:0px ! important;
+		padding-bottom:2em ! important;
+	}
+	.tagglyTagging .button, .tagglyTagging .hidebutton {
+		display: none ! important;
+	}
+	.headerShadow {
+		visibility: hidden ! important;
+	}
+	.tagglyTagged .quickopentag, .tagged .quickopentag {
+		border-style: none ! important;
+	}
+	.quickopentag a.button, .miniTag {
+		display: none ! important;
+	}
+}
+
+/* get user styles specified in StyleSheet */
+[[StyleSheet]]
+
+/*}}}*/
+
+</pre>
+</div>
+<div title="MptwTrimTheme" modifier="MPTW" modified="201009151231" created="201004041418" tags="systemTheme">
+<pre>|Name|MptwTrim|
+|Description|Mptw Theme with a reduced header to increase useful space|
+|ViewTemplate|MptwTheme##ViewTemplate|
+|EditTemplate|MptwTheme##EditTemplate|
+|StyleSheet|MptwTheme##StyleSheet|
+|PageTemplate|##PageTemplate|
+
+!PageTemplate
+&lt;!--{{{--&gt;
+
+&lt;!-- horizontal MainMenu --&gt;
+&lt;div id='topMenu' macro='gradient vert [[ColorPalette::PrimaryLight]] [[ColorPalette::PrimaryMid]]'&gt;
+&lt;span refresh='content' tiddler='SiteTitle' style=&quot;padding-left:1em;font-weight:bold;&quot;&gt;&lt;/span&gt;:
+&lt;span refresh='content' tiddler='MainMenu'&gt;&lt;/span&gt;
+&lt;/div&gt;
+&lt;div id='sidebar'&gt;
+	&lt;div id='sidebarOptions'&gt;
+		&lt;div refresh='content' tiddler='SideBarOptions'&gt;&lt;/div&gt;
+		&lt;div style=&quot;margin-left:0.1em;&quot;
+			macro='slider chkTabSliderPanel SideBarTabs {{&quot;tabs \u00bb&quot;}} &quot;Show Timeline, All, Tags, etc&quot;'&gt;&lt;/div&gt;
+	&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id='displayArea'&gt;
+	&lt;div id='messageArea'&gt;&lt;/div&gt;
+	&lt;div id='tiddlerDisplay'&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+</pre>
+</div>
+<div title="MptwUpgradeURL" modifier="MPTW" modified="201009151231" created="201004041418" tags="systemServer">
+<pre>For upgrading. See [[ImportTiddlers]].
+URL: http://mptw.tiddlyspot.com/upgrade.html
+</pre>
+</div>
+<div title="MptwUserConfigPlugin" modifier="MPTW" modified="201009151231" created="201004041418" tags="systemConfig">
+<pre>/***
+|Description:|A place to put your config tweaks so they aren't overwritten when you upgrade MPTW|
+See http://www.tiddlywiki.org/wiki/Configuration_Options for other options you can set. In some cases where there are clashes with other plugins it might help to rename this to zzMptwUserConfigPlugin so it gets executed last.
+***/
+//{{{
+
+// example: set your preferred date format
+//config.mptwDateFormat = 'MM/0DD/YY';
+//config.mptwJournalFormat = 'Journal MM/0DD/YY';
+
+// example: set the theme you want to start with
+//config.options.txtTheme = 'MptwRoundTheme';
+
+// example: switch off autosave, switch on backups and set a backup folder
+//config.options.chkSaveBackups = true;
+//config.options.chkAutoSave = false;
+//config.options.txtBackupFolder = 'backups';
+
+// uncomment to disable 'new means new' functionality for the new journal macro
+//config.newMeansNewForJournalsToo = false;
+
+//}}}
+</pre>
+</div>
+<div title="NewHerePlugin" modifier="MPTW" modified="201009151231" created="201004041418" tags="systemConfig">
+<pre>/***
+|Name:|NewHerePlugin|
+|Description:|Creates the new here and new journal macros|
+|Version:|3.0 ($Rev: 3861 $)|
+|Date:|$Date: 2008-03-08 10:53:09 +1000 (Sat, 08 Mar 2008) $|
+|Source:|http://mptw.tiddlyspot.com/#NewHerePlugin|
+|Author:|Simon Baird &lt;simon.baird@gmail.com&gt;|
+|License|http://mptw.tiddlyspot.com/#TheBSDLicense|
+***/
+//{{{
+merge(config.macros, {
+	newHere: {
+		handler: function(place,macroName,params,wikifier,paramString,tiddler) {
+			wikify(&quot;&lt;&lt;newTiddler &quot;+paramString+&quot; tag:[[&quot;+tiddler.title+&quot;]]&gt;&gt;&quot;,place,null,tiddler);
+		}
+	},
+	newJournalHere: {
+		handler: function(place,macroName,params,wikifier,paramString,tiddler) {
+			wikify(&quot;&lt;&lt;newJournal &quot;+paramString+&quot; tag:[[&quot;+tiddler.title+&quot;]]&gt;&gt;&quot;,place,null,tiddler);
+		}
+	}
+});
+
+//}}}
+
+</pre>
+</div>
+<div title="NewMeansNewPlugin" modifier="MPTW" modified="201009151231" created="201004041422" tags="systemConfig">
+<pre>/***
+|Name:|NewMeansNewPlugin|
+|Description:|If 'New Tiddler' already exists then create 'New Tiddler (1)' and so on|
+|Version:|1.1.1 ($Rev: 2263 $)|
+|Date:|$Date: 2007-06-13 04:22:32 +1000 (Wed, 13 Jun 2007) $|
+|Source:|http://mptw.tiddlyspot.com/empty.html#NewMeansNewPlugin|
+|Author:|Simon Baird &lt;simon.baird@gmail.com&gt;|
+|License|http://mptw.tiddlyspot.com/#TheBSDLicense|
+!!Note: I think this should be in the core
+***/
+//{{{
+
+// change this or set config.newMeansNewForJournalsToo it in MptwUuserConfigPlugin
+if (config.newMeansNewForJournalsToo == undefined) config.newMeansNewForJournalsToo = true;
+
+String.prototype.getNextFreeName = function() {
+	numberRegExp = / \(([0-9]+)\)$/;
+	var match = numberRegExp.exec(this);
+	if (match) {
+	var num = parseInt(match[1]) + 1;
+		return this.replace(numberRegExp,&quot; (&quot;+num+&quot;)&quot;);
+	}
+	else {
+		return this + &quot; (1)&quot;;
+	}
+}
+
+config.macros.newTiddler.checkForUnsaved = function(newName) {
+	var r = false;
+	story.forEachTiddler(function(title,element) {
+		if (title == newName)
+			r = true;
+	});
+	return r;
+}
+
+config.macros.newTiddler.getName = function(newName) {
+	while (store.getTiddler(newName) || config.macros.newTiddler.checkForUnsaved(newName))
+		newName = newName.getNextFreeName();
+	return newName;
+}
+
+
+config.macros.newTiddler.onClickNewTiddler = function()
+{
+	var title = this.getAttribute(&quot;newTitle&quot;);
+	if(this.getAttribute(&quot;isJournal&quot;) == &quot;true&quot;) {
+		title = new Date().formatString(title.trim());
+	}
+
+	// ---- these three lines should be the only difference between this and the core onClickNewTiddler
+	if (config.newMeansNewForJournalsToo || this.getAttribute(&quot;isJournal&quot;) != &quot;true&quot;)
+		title = config.macros.newTiddler.getName(title);
+
+	var params = this.getAttribute(&quot;params&quot;);
+	var tags = params ? params.split(&quot;|&quot;) : [];
+	var focus = this.getAttribute(&quot;newFocus&quot;);
+	var template = this.getAttribute(&quot;newTemplate&quot;);
+	var customFields = this.getAttribute(&quot;customFields&quot;);
+	if(!customFields &amp;&amp; !store.isShadowTiddler(title))
+		customFields = String.encodeHashMap(config.defaultCustomFields);
+	story.displayTiddler(null,title,template,false,null,null);
+	var tiddlerElem = story.getTiddler(title);
+	if(customFields)
+		story.addCustomFields(tiddlerElem,customFields);
+	var text = this.getAttribute(&quot;newText&quot;);
+	if(typeof text == &quot;string&quot;)
+		story.getTiddlerField(title,&quot;text&quot;).value = text.format([title]);
+	for(var t=0;t&lt;tags.length;t++)
+		story.setTiddlerTag(title,tags[t],+1);
+	story.focusTiddler(title,focus);
+	return false;
+};
+
+//}}}
+
+</pre>
+</div>
+<div title="PrettyDatesPlugin" modifier="MPTW" modified="201009151231" created="201004041418" tags="systemConfig">
+<pre>/***
+|Name:|PrettyDatesPlugin|
+|Description:|Provides a new date format ('pppp') that displays times such as '2 days ago'|
+|Version:|1.0 ($Rev: 3646 $)|
+|Date:|$Date: 2008-02-27 02:34:38 +1000 (Wed, 27 Feb 2008) $|
+|Source:|http://mptw.tiddlyspot.com/#PrettyDatesPlugin|
+|Author:|Simon Baird &lt;simon.baird@gmail.com&gt;|
+|License:|http://mptw.tiddlyspot.com/#TheBSDLicense|
+!!Notes
+* If you want to you can rename this plugin. :) Some suggestions: LastUpdatedPlugin, RelativeDatesPlugin, SmartDatesPlugin, SexyDatesPlugin.
+* Inspired by http://ejohn.org/files/pretty.js
+***/
+//{{{
+Date.prototype.prettyDate = function() {
+	var diff = (((new Date()).getTime() - this.getTime()) / 1000);
+	var day_diff = Math.floor(diff / 86400);
+
+	if (isNaN(day_diff))      return &quot;&quot;;
+	else if (diff &lt; 0)        return &quot;in the future&quot;;
+	else if (diff &lt; 60)       return &quot;just now&quot;;
+	else if (diff &lt; 120)      return &quot;1 minute ago&quot;;
+	else if (diff &lt; 3600)     return Math.floor(diff/60) + &quot; minutes ago&quot;;
+	else if (diff &lt; 7200)     return &quot;1 hour ago&quot;;
+	else if (diff &lt; 86400)    return Math.floor(diff/3600) + &quot; hours ago&quot;;
+	else if (day_diff == 1)   return &quot;Yesterday&quot;;
+	else if (day_diff &lt; 7)    return day_diff + &quot; days ago&quot;;
+	else if (day_diff &lt; 14)   return  &quot;a week ago&quot;;
+	else if (day_diff &lt; 31)   return Math.ceil(day_diff/7) + &quot; weeks ago&quot;;
+	else if (day_diff &lt; 62)   return &quot;a month ago&quot;;
+	else if (day_diff &lt; 365)  return &quot;about &quot; + Math.ceil(day_diff/31) + &quot; months ago&quot;;
+	else if (day_diff &lt; 730)  return &quot;a year ago&quot;;
+	else                      return Math.ceil(day_diff/365) + &quot; years ago&quot;;
+}
+
+Date.prototype.formatString_orig_mptw = Date.prototype.formatString;
+
+Date.prototype.formatString = function(template) {
+	return this.formatString_orig_mptw(template).replace(/pppp/,this.prettyDate());
+}
+
+// for MPTW. otherwise edit your ViewTemplate as required.
+// config.mptwDateFormat = 'pppp (DD/MM/YY)'; 
+config.mptwDateFormat = 'pppp'; 
+
+//}}}
+
+</pre>
+</div>
+<div title="QuickOpenTagPlugin" modifier="MPTW" modified="201009151231" created="201004041418" tags="systemConfig">
+<pre>/***
+|Name:|QuickOpenTagPlugin|
+|Description:|Changes tag links to make it easier to open tags as tiddlers|
+|Version:|3.0.1 ($Rev: 3861 $)|
+|Date:|$Date: 2008-03-08 10:53:09 +1000 (Sat, 08 Mar 2008) $|
+|Source:|http://mptw.tiddlyspot.com/#QuickOpenTagPlugin|
+|Author:|Simon Baird &lt;simon.baird@gmail.com&gt;|
+|License:|http://mptw.tiddlyspot.com/#TheBSDLicense|
+***/
+//{{{
+config.quickOpenTag = {
+
+	dropdownChar: (document.all ? &quot;\u25bc&quot; : &quot;\u25be&quot;), // the little one doesn't work in IE?
+
+	createTagButton: function(place,tag,excludeTiddler) {
+		// little hack so we can do this: &lt;&lt;tag PrettyTagName|RealTagName&gt;&gt;
+		var splitTag = tag.split(&quot;|&quot;);
+		var pretty = tag;
+		if (splitTag.length == 2) {
+			tag = splitTag[1];
+			pretty = splitTag[0];
+		}
+		
+		var sp = createTiddlyElement(place,&quot;span&quot;,null,&quot;quickopentag&quot;);
+		createTiddlyText(createTiddlyLink(sp,tag,false),pretty);
+		
+		var theTag = createTiddlyButton(sp,config.quickOpenTag.dropdownChar,
+                        config.views.wikified.tag.tooltip.format([tag]),onClickTag);
+		theTag.setAttribute(&quot;tag&quot;,tag);
+		if (excludeTiddler)
+			theTag.setAttribute(&quot;tiddler&quot;,excludeTiddler);
+    		return(theTag);
+	},
+
+	miniTagHandler: function(place,macroName,params,wikifier,paramString,tiddler) {
+		var tagged = store.getTaggedTiddlers(tiddler.title);
+		if (tagged.length &gt; 0) {
+			var theTag = createTiddlyButton(place,config.quickOpenTag.dropdownChar,
+                        	config.views.wikified.tag.tooltip.format([tiddler.title]),onClickTag);
+			theTag.setAttribute(&quot;tag&quot;,tiddler.title);
+			theTag.className = &quot;miniTag&quot;;
+		}
+	},
+
+	allTagsHandler: function(place,macroName,params) {
+		var tags = store.getTags(params[0]);
+		var filter = params[1]; // new feature
+		var ul = createTiddlyElement(place,&quot;ul&quot;);
+		if(tags.length == 0)
+			createTiddlyElement(ul,&quot;li&quot;,null,&quot;listTitle&quot;,this.noTags);
+		for(var t=0; t&lt;tags.length; t++) {
+			var title = tags[t][0];
+			if (!filter || (title.match(new RegExp('^'+filter)))) {
+				var info = getTiddlyLinkInfo(title);
+				var theListItem =createTiddlyElement(ul,&quot;li&quot;);
+				var theLink = createTiddlyLink(theListItem,tags[t][0],true);
+				var theCount = &quot; (&quot; + tags[t][1] + &quot;)&quot;;
+				theLink.appendChild(document.createTextNode(theCount));
+				var theDropDownBtn = createTiddlyButton(theListItem,&quot; &quot; +
+					config.quickOpenTag.dropdownChar,this.tooltip.format([tags[t][0]]),onClickTag);
+				theDropDownBtn.setAttribute(&quot;tag&quot;,tags[t][0]);
+			}
+		}
+	},
+
+	// todo fix these up a bit
+	styles: [
+&quot;/*{{{*/&quot;,
+&quot;/* created by QuickOpenTagPlugin */&quot;,
+&quot;.tagglyTagged .quickopentag, .tagged .quickopentag &quot;,
+&quot;	{ margin-right:1.2em; border:1px solid #eee; padding:2px; padding-right:0px; padding-left:1px; }&quot;,
+&quot;.quickopentag .tiddlyLink { padding:2px; padding-left:3px; }&quot;,
+&quot;.quickopentag a.button { padding:1px; padding-left:2px; padding-right:2px;}&quot;,
+&quot;/* extra specificity to make it work right */&quot;,
+&quot;#displayArea .viewer .quickopentag a.button, &quot;,
+&quot;#displayArea .viewer .quickopentag a.tiddyLink, &quot;,
+&quot;#mainMenu .quickopentag a.tiddyLink, &quot;,
+&quot;#mainMenu .quickopentag a.tiddyLink &quot;,
+&quot;	{ border:0px solid black; }&quot;,
+&quot;#displayArea .viewer .quickopentag a.button, &quot;,
+&quot;#mainMenu .quickopentag a.button &quot;,
+&quot;	{ margin-left:0px; padding-left:2px; }&quot;,
+&quot;#displayArea .viewer .quickopentag a.tiddlyLink, &quot;,
+&quot;#mainMenu .quickopentag a.tiddlyLink &quot;,
+&quot;	{ margin-right:0px; padding-right:0px; padding-left:0px; margin-left:0px; }&quot;,
+&quot;a.miniTag {font-size:150%;} &quot;,
+&quot;#mainMenu .quickopentag a.button &quot;,
+&quot;	/* looks better in right justified main menus */&quot;,
+&quot;	{ margin-left:0px; padding-left:2px; margin-right:0px; padding-right:0px; }&quot;, 
+&quot;#topMenu .quickopentag { padding:0px; margin:0px; border:0px; }&quot;,
+&quot;#topMenu .quickopentag .tiddlyLink { padding-right:1px; margin-right:0px; }&quot;,
+&quot;#topMenu .quickopentag .button { padding-left:1px; margin-left:0px; border:0px; }&quot;,
+&quot;/*}}}*/&quot;,
+		&quot;&quot;].join(&quot;\n&quot;),
+
+	init: function() {
+		// we fully replace these builtins. can't hijack them easily
+		window.createTagButton = this.createTagButton;
+		config.macros.allTags.handler = this.allTagsHandler;
+		config.macros.miniTag = { handler: this.miniTagHandler };
+		config.shadowTiddlers[&quot;QuickOpenTagStyles&quot;] = this.styles;
+		store.addNotification(&quot;QuickOpenTagStyles&quot;,refreshStyles);
+	}
+}
+
+config.quickOpenTag.init();
+
+//}}}
+
+</pre>
+</div>
+<div title="RenameTagsPlugin" modifier="MPTW" modified="201009151231" created="201008231244" tags="systemConfig">
+<pre>/***
+|Name:|RenameTagsPlugin|
+|Description:|Allows you to easily rename or delete tags across multiple tiddlers|
+|Version:|3.0 ($Rev: 5501 $)|
+|Date:|$Date: 2008-06-10 23:11:55 +1000 (Tue, 10 Jun 2008) $|
+|Source:|http://mptw.tiddlyspot.com/#RenameTagsPlugin|
+|Author:|Simon Baird &lt;simon.baird@gmail.com&gt;|
+|License|http://mptw.tiddlyspot.com/#TheBSDLicense|
+Rename a tag and you will be prompted to rename it in all its tagged tiddlers.
+***/
+//{{{
+config.renameTags = {
+
+	prompts: {
+		rename: &quot;Rename the tag '%0' to '%1' in %2 tidder%3?&quot;,
+		remove: &quot;Remove the tag '%0' from %1 tidder%2?&quot;
+	},
+
+	removeTag: function(tag,tiddlers) {
+		store.suspendNotifications();
+		for (var i=0;i&lt;tiddlers.length;i++) {
+			store.setTiddlerTag(tiddlers[i].title,false,tag);
+		}
+		store.resumeNotifications();
+		store.notifyAll();
+	},
+
+	renameTag: function(oldTag,newTag,tiddlers) {
+		store.suspendNotifications();
+		for (var i=0;i&lt;tiddlers.length;i++) {
+			store.setTiddlerTag(tiddlers[i].title,false,oldTag); // remove old
+			store.setTiddlerTag(tiddlers[i].title,true,newTag);  // add new
+		}
+		store.resumeNotifications();
+		store.notifyAll();
+	},
+
+	storeMethods: {
+
+		saveTiddler_orig_renameTags: TiddlyWiki.prototype.saveTiddler,
+
+		saveTiddler: function(title,newTitle,newBody,modifier,modified,tags,fields,clearChangeCount,created,creator) {
+			if (title != newTitle) {
+				var tagged = this.getTaggedTiddlers(title);
+				if (tagged.length &gt; 0) {
+					// then we are renaming a tag
+					if (confirm(config.renameTags.prompts.rename.format([title,newTitle,tagged.length,tagged.length&gt;1?&quot;s&quot;:&quot;&quot;])))
+						config.renameTags.renameTag(title,newTitle,tagged);
+
+					if (!this.tiddlerExists(title) &amp;&amp; newBody == &quot;&quot;)
+						// dont create unwanted tiddler
+						return null;
+				}
+			}
+			return this.saveTiddler_orig_renameTags(title,newTitle,newBody,modifier,modified,tags,fields,clearChangeCount,created,creator);
+		},
+
+		removeTiddler_orig_renameTags: TiddlyWiki.prototype.removeTiddler,
+
+		removeTiddler: function(title) {
+			var tagged = this.getTaggedTiddlers(title);
+			if (tagged.length &gt; 0)
+				if (confirm(config.renameTags.prompts.remove.format([title,tagged.length,tagged.length&gt;1?&quot;s&quot;:&quot;&quot;])))
+					config.renameTags.removeTag(title,tagged);
+			return this.removeTiddler_orig_renameTags(title);
+		}
+
+	},
+
+	init: function() {
+		merge(TiddlyWiki.prototype,this.storeMethods);
+	}
+}
+
+config.renameTags.init();
+
+//}}}
+
+</pre>
+</div>
+<div title="SaveCloseTiddlerPlugin" modifier="MPTW" modified="201009151231" created="201004041418" tags="systemConfig">
+<pre>/***
+|Name:|SaveCloseTiddlerPlugin|
+|Description:|Provides two extra toolbar commands, saveCloseTiddler and cancelCloseTiddler|
+|Version:|3.0 ($Rev: 5502 $)|
+|Date:|$Date: 2008-06-10 23:31:39 +1000 (Tue, 10 Jun 2008) $|
+|Source:|http://mptw.tiddlyspot.com/#SaveCloseTiddlerPlugin|
+|Author:|Simon Baird &lt;simon.baird@gmail.com&gt;|
+|License:|http://mptw.tiddlyspot.com/#TheBSDLicense|
+To use these you must add them to the tool bar in your EditTemplate
+***/
+//{{{
+merge(config.commands,{
+
+	saveCloseTiddler: {
+		text: 'done/close',
+		tooltip: 'Save changes to this tiddler and close it',
+		handler: function(ev,src,title) {
+			var closeTitle = title;
+			var newTitle = story.saveTiddler(title,ev.shiftKey);
+			if (newTitle)
+				closeTitle = newTitle;
+			return config.commands.closeTiddler.handler(ev,src,closeTitle);
+		}
+	},
+
+	cancelCloseTiddler: {
+		text: 'cancel/close',
+		tooltip: 'Undo changes to this tiddler and close it',
+		handler: function(ev,src,title) {
+			// the same as closeTiddler now actually
+			return config.commands.closeTiddler.handler(ev,src,title);
+		}
+	}
+
+});
+
+//}}}
+
+</pre>
+</div>
+<div title="SelectThemePlugin" modifier="MPTW" modified="201009151231" created="201004041422" tags="systemConfig">
+<pre>/***
+|Name:|SelectThemePlugin|
+|Description:|Lets you easily switch theme and palette|
+|Version:|1.0.1 ($Rev: 3646 $)|
+|Date:|$Date: 2008-02-27 02:34:38 +1000 (Wed, 27 Feb 2008) $|
+|Source:|http://mptw.tiddlyspot.com/#SelectThemePlugin|
+|Author:|Simon Baird &lt;simon.baird@gmail.com&gt;|
+|License:|http://mptw.tiddlyspot.com/#TheBSDLicense|
+!Notes
+* Borrows largely from ThemeSwitcherPlugin by Martin Budden http://www.martinswiki.com/#ThemeSwitcherPlugin
+* Theme is cookie based. But set a default by setting config.options.txtTheme in MptwConfigPlugin (for example)
+* Palette is not cookie based. It actually overwrites your ColorPalette tiddler when you select a palette, so beware. 
+!Usage
+* {{{&lt;&lt;selectTheme&gt;&gt;}}} makes a dropdown selector
+* {{{&lt;&lt;selectPalette&gt;&gt;}}} makes a dropdown selector
+* {{{&lt;&lt;applyTheme&gt;&gt;}}} applies the current tiddler as a theme
+* {{{&lt;&lt;applyPalette&gt;&gt;}}} applies the current tiddler as a palette
+* {{{&lt;&lt;applyTheme TiddlerName&gt;&gt;}}} applies TiddlerName as a theme
+* {{{&lt;&lt;applyPalette TiddlerName&gt;&gt;}}} applies TiddlerName as a palette
+***/
+//{{{
+
+config.macros.selectTheme = {
+	label: {
+		selectTheme:&quot;select theme&quot;,
+		selectPalette:&quot;select palette&quot;
+	},
+	prompt: {
+		selectTheme:&quot;Select the current theme&quot;,
+		selectPalette:&quot;Select the current palette&quot;
+	},
+	tags: {
+		selectTheme:'systemTheme',
+		selectPalette:'systemPalette'
+	}
+};
+
+config.macros.selectTheme.handler = function(place,macroName)
+{
+	var btn = createTiddlyButton(place,this.label[macroName],this.prompt[macroName],this.onClick);
+	// want to handle palettes and themes with same code. use mode attribute to distinguish
+	btn.setAttribute('mode',macroName);
+};
+
+config.macros.selectTheme.onClick = function(ev)
+{
+	var e = ev ? ev : window.event;
+	var popup = Popup.create(this);
+	var mode = this.getAttribute('mode');
+	var tiddlers = store.getTaggedTiddlers(config.macros.selectTheme.tags[mode]);
+	// for default
+	if (mode == &quot;selectPalette&quot;) {
+		var btn = createTiddlyButton(createTiddlyElement(popup,'li'),&quot;(default)&quot;,&quot;default color palette&quot;,config.macros.selectTheme.onClickTheme);
+		btn.setAttribute('theme',&quot;(default)&quot;);
+		btn.setAttribute('mode',mode);
+	}
+	for(var i=0; i&lt;tiddlers.length; i++) {
+		var t = tiddlers[i].title;
+		var name = store.getTiddlerSlice(t,'Name');
+		var desc = store.getTiddlerSlice(t,'Description');
+		var btn = createTiddlyButton(createTiddlyElement(popup,'li'), name?name:t, desc?desc:config.macros.selectTheme.label['mode'], config.macros.selectTheme.onClickTheme);
+		btn.setAttribute('theme',t);
+		btn.setAttribute('mode',mode);
+	}
+	Popup.show();
+	return stopEvent(e);
+};
+
+config.macros.selectTheme.onClickTheme = function(ev)
+{
+	var mode = this.getAttribute('mode');
+	var theme = this.getAttribute('theme');
+	if (mode == 'selectTheme')
+		story.switchTheme(theme);
+	else // selectPalette
+		config.macros.selectTheme.updatePalette(theme);
+	return false;
+};
+
+config.macros.selectTheme.updatePalette = function(title)
+{
+	if (title != &quot;&quot;) {
+		store.deleteTiddler(&quot;ColorPalette&quot;);
+		if (title != &quot;(default)&quot;)
+			store.saveTiddler(&quot;ColorPalette&quot;,&quot;ColorPalette&quot;,store.getTiddlerText(title),
+					config.options.txtUserName,undefined,&quot;&quot;);
+		refreshAll();
+		if(config.options.chkAutoSave)
+			saveChanges(true);
+	}
+};
+
+config.macros.applyTheme = {
+	label: &quot;apply&quot;,
+	prompt: &quot;apply this theme or palette&quot; // i'm lazy
+};
+
+config.macros.applyTheme.handler = function(place,macroName,params,wikifier,paramString,tiddler) {
+	var useTiddler = params[0] ? params[0] : tiddler.title;
+	var btn = createTiddlyButton(place,this.label,this.prompt,config.macros.selectTheme.onClickTheme);
+	btn.setAttribute('theme',useTiddler);
+	btn.setAttribute('mode',macroName==&quot;applyTheme&quot;?&quot;selectTheme&quot;:&quot;selectPalette&quot;); // a bit untidy here
+}
+
+config.macros.selectPalette = config.macros.selectTheme;
+config.macros.applyPalette = config.macros.applyTheme;
+
+config.macros.refreshAll = { handler: function(place,macroName,params,wikifier,paramString,tiddler) {
+	createTiddlyButton(place,&quot;refresh&quot;,&quot;refresh layout and styles&quot;,function() { refreshAll(); });
+}};
+
+//}}}
+
+</pre>
+</div>
+<div title="TabAllTags" modifier="MPTW" modified="201009151231" created="201004041418">
+<pre>&lt;&lt;allTags excludeLists&gt;&gt;
+</pre>
+</div>
+<div title="TabMore" modifier="MPTW" modified="201009151231" created="201004041418">
+<pre>&lt;&lt;tabs txtMoreTab &quot;Tags&quot; &quot;All Tags&quot; TabAllTags &quot;Miss&quot; &quot;Missing tiddlers&quot; TabMoreMissing &quot;Orph&quot; &quot;Orphaned tiddlers&quot; TabMoreOrphans &quot;Shad&quot; &quot;Shadowed tiddlers&quot; TabMoreShadowed&gt;&gt;
+</pre>
+</div>
+<div title="TabTags" modifier="MPTW" modified="201009151231" created="201004041418">
+<pre>&lt;&lt;allTags excludeLists [a-z]&gt;&gt;
+</pre>
+</div>
+<div title="TagglyTaggingPlugin" modifier="MPTW" modified="201009151231" created="201004191432" tags="systemConfig">
+<pre>/***
+|Name:|TagglyTaggingPlugin|
+|Description:|tagglyTagging macro is a replacement for the builtin tagging macro in your ViewTemplate|
+|Version:|3.3.1 ($Rev: 9828 $)|
+|Date:|$Date: 2009-06-03 21:38:41 +1000 (Wed, 03 Jun 2009) $|
+|Source:|http://mptw.tiddlyspot.com/#TagglyTaggingPlugin|
+|Author:|Simon Baird &lt;simon.baird@gmail.com&gt;|
+|License:|http://mptw.tiddlyspot.com/#TheBSDLicense|
+!Notes
+See http://mptw.tiddlyspot.com/#TagglyTagging
+***/
+//{{{
+
+merge(String.prototype,{
+
+	parseTagExpr: function(debug) {
+
+		if (this.trim() == &quot;&quot;)
+			return &quot;(true)&quot;;
+
+		var anyLogicOp = /(!|&amp;&amp;|\|\||\(|\))/g;
+		var singleLogicOp = /^(!|&amp;&amp;|\|\||\(|\))$/;
+
+		var spaced = this.
+			// because square brackets in templates are no good
+			// this means you can use [(With Spaces)] instead of [[With Spaces]]
+			replace(/\[\(/g,&quot; [[&quot;).
+			replace(/\)\]/g,&quot;]] &quot;). 
+			// space things out so we can use readBracketedList. tricky eh?
+			replace(anyLogicOp,&quot; $1 &quot;);
+
+		var expr = &quot;&quot;;
+
+		var tokens = spaced.readBracketedList(false); // false means don't uniq the list. nice one JR!
+
+		for (var i=0;i&lt;tokens.length;i++)
+			if (tokens[i].match(singleLogicOp))
+				expr += tokens[i];
+			else
+				expr += &quot;tiddler.tags.contains('%0')&quot;.format([tokens[i].replace(/'/,&quot;\\'&quot;)]); // fix single quote bug. still have round bracket bug i think
+
+		if (debug)
+			alert(expr);
+
+		return '('+expr+')';
+	}
+
+});
+
+merge(TiddlyWiki.prototype,{
+	getTiddlersByTagExpr: function(tagExpr,sortField) {
+
+		var result = [];
+
+		var expr = tagExpr.parseTagExpr();
+
+		store.forEachTiddler(function(title,tiddler) {
+			if (eval(expr))
+				result.push(tiddler);
+		});
+
+		if(!sortField)
+			sortField = &quot;title&quot;;
+
+		result.sort(function(a,b) {return a[sortField] &lt; b[sortField] ? -1 : (a[sortField] == b[sortField] ? 0 : +1);});
+		
+		return result;
+	}
+});
+
+config.taggly = {
+
+	// for translations
+	lingo: {
+		labels: {
+			asc:        &quot;\u2191&quot;, // down arrow
+			desc:       &quot;\u2193&quot;, // up arrow
+			title:      &quot;title&quot;,
+			modified:   &quot;modified&quot;,
+			created:    &quot;created&quot;,
+			show:       &quot;+&quot;,
+			hide:       &quot;-&quot;,
+			normal:     &quot;normal&quot;,
+			group:      &quot;group&quot;,
+			commas:     &quot;commas&quot;,
+			sitemap:    &quot;sitemap&quot;,
+			numCols:    &quot;cols\u00b1&quot;, // plus minus sign
+			label:      &quot;Tagged as '%0':&quot;,
+			exprLabel:  &quot;Matching tag expression '%0':&quot;,
+			excerpts:   &quot;excerpts&quot;,
+			descr:      &quot;descr&quot;,
+			slices:     &quot;slices&quot;,
+			contents:   &quot;contents&quot;,
+			sliders:    &quot;sliders&quot;,
+			noexcerpts: &quot;title only&quot;,
+			noneFound:  &quot;(none)&quot;
+		},
+
+		tooltips: {
+			title:      &quot;Click to sort by title&quot;,
+			modified:   &quot;Click to sort by modified date&quot;,
+			created:    &quot;Click to sort by created date&quot;,
+			show:       &quot;Click to show tagging list&quot;,
+			hide:       &quot;Click to hide tagging list&quot;,
+			normal:     &quot;Click to show a normal ungrouped list&quot;,
+			group:      &quot;Click to show list grouped by tag&quot;,
+			sitemap:    &quot;Click to show a sitemap style list&quot;,
+			commas:     &quot;Click to show a comma separated list&quot;,
+			numCols:    &quot;Click to change number of columns&quot;,
+			excerpts:   &quot;Click to show excerpts&quot;,
+			descr:      &quot;Click to show the description slice&quot;,
+			slices:     &quot;Click to show all slices&quot;,
+			contents:   &quot;Click to show entire tiddler contents&quot;,
+			sliders:    &quot;Click to show tiddler contents in sliders&quot;,
+			noexcerpts: &quot;Click to show entire title only&quot;
+		},
+
+		tooDeepMessage: &quot;* //sitemap too deep...//&quot;
+	},
+
+	config: {
+		showTaggingCounts: true,
+		listOpts: {
+			// the first one will be the default
+			sortBy:     [&quot;title&quot;,&quot;modified&quot;,&quot;created&quot;],
+			sortOrder:  [&quot;asc&quot;,&quot;desc&quot;],
+			hideState:  [&quot;show&quot;,&quot;hide&quot;],
+			listMode:   [&quot;normal&quot;,&quot;group&quot;,&quot;sitemap&quot;,&quot;commas&quot;],
+			numCols:    [&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,&quot;4&quot;,&quot;5&quot;,&quot;6&quot;],
+			excerpts:   [&quot;noexcerpts&quot;,&quot;excerpts&quot;,&quot;descr&quot;,&quot;slices&quot;,&quot;contents&quot;,&quot;sliders&quot;]
+		},
+		valuePrefix: &quot;taggly.&quot;,
+		excludeTags: [&quot;excludeLists&quot;,&quot;excludeTagging&quot;],
+		excerptSize: 50,
+		excerptMarker: &quot;/%&quot;+&quot;%/&quot;,
+		siteMapDepthLimit: 25
+	},
+
+	getTagglyOpt: function(title,opt) {
+		var val = store.getValue(title,this.config.valuePrefix+opt);
+		return val ? val : this.config.listOpts[opt][0];
+	},
+
+	setTagglyOpt: function(title,opt,value) {
+		// create it silently if it doesn't exist
+		if (!store.tiddlerExists(title)) {
+			store.saveTiddler(title,title,config.views.editor.defaultText.format([title]),config.options.txtUserName,new Date(),&quot;&quot;);
+
+			// &lt;&lt;tagglyTagging expr:&quot;...&quot;&gt;&gt; creates a tiddler to store its display settings
+			// Make those tiddlers less noticeable by tagging as excludeSearch and excludeLists
+			// Because we don't want to hide real tags, check that they aren't actually tags before doing so
+			// Also tag them as tagglyExpression for manageability
+			// (contributed by RA)
+			if (!store.getTaggedTiddlers(title).length) {
+				store.setTiddlerTag(title,true,&quot;excludeSearch&quot;);
+				store.setTiddlerTag(title,true,&quot;excludeLists&quot;);
+				store.setTiddlerTag(title,true,&quot;tagglyExpression&quot;);
+			}
+		}
+
+		// if value is default then remove it to save space
+		return store.setValue(title, this.config.valuePrefix+opt, value == this.config.listOpts[opt][0] ? null : value);
+	},
+
+	getNextValue: function(title,opt) {
+		var current = this.getTagglyOpt(title,opt);
+		var pos = this.config.listOpts[opt].indexOf(current);
+		// supposed to automagically don't let cols cycle up past the number of items
+		// currently broken in some situations, eg when using an expression
+		// lets fix it later when we rewrite for jquery
+		// the columns thing should be jquery table manipulation probably
+		var limit = (opt == &quot;numCols&quot; ? store.getTaggedTiddlers(title).length : this.config.listOpts[opt].length);
+		var newPos = (pos + 1) % limit;
+		return this.config.listOpts[opt][newPos];
+	},
+
+	toggleTagglyOpt: function(title,opt) {
+		var newVal = this.getNextValue(title,opt);
+		this.setTagglyOpt(title,opt,newVal);
+	}, 
+
+	createListControl: function(place,title,type) {
+		var lingo = config.taggly.lingo;
+		var label;
+		var tooltip;
+		var onclick;
+
+		if ((type == &quot;title&quot; || type == &quot;modified&quot; || type == &quot;created&quot;)) {
+			// &quot;special&quot; controls. a little tricky. derived from sortOrder and sortBy
+			label = lingo.labels[type];
+			tooltip = lingo.tooltips[type];
+
+			if (this.getTagglyOpt(title,&quot;sortBy&quot;) == type) {
+				label += lingo.labels[this.getTagglyOpt(title,&quot;sortOrder&quot;)];
+				onclick = function() {
+					config.taggly.toggleTagglyOpt(title,&quot;sortOrder&quot;);
+					return false;
+				}
+			}
+			else {
+				onclick = function() {
+					config.taggly.setTagglyOpt(title,&quot;sortBy&quot;,type);
+					config.taggly.setTagglyOpt(title,&quot;sortOrder&quot;,config.taggly.config.listOpts.sortOrder[0]);
+					return false;
+				}
+			}
+		}
+		else {
+			// &quot;regular&quot; controls, nice and simple
+			label = lingo.labels[type == &quot;numCols&quot; ? type : this.getNextValue(title,type)];
+			tooltip = lingo.tooltips[type == &quot;numCols&quot; ? type : this.getNextValue(title,type)];
+			onclick = function() {
+				config.taggly.toggleTagglyOpt(title,type);
+				return false;
+			}
+		}
+
+		// hide button because commas don't have columns
+		if (!(this.getTagglyOpt(title,&quot;listMode&quot;) == &quot;commas&quot; &amp;&amp; type == &quot;numCols&quot;))
+			createTiddlyButton(place,label,tooltip,onclick,type == &quot;hideState&quot; ? &quot;hidebutton&quot; : &quot;button&quot;);
+	},
+
+	makeColumns: function(orig,numCols) {
+		var listSize = orig.length;
+		var colSize = listSize/numCols;
+		var remainder = listSize % numCols;
+
+		var upperColsize = colSize;
+		var lowerColsize = colSize;
+
+		if (colSize != Math.floor(colSize)) {
+			// it's not an exact fit so..
+			upperColsize = Math.floor(colSize) + 1;
+			lowerColsize = Math.floor(colSize);
+		}
+
+		var output = [];
+		var c = 0;
+		for (var j=0;j&lt;numCols;j++) {
+			var singleCol = [];
+			var thisSize = j &lt; remainder ? upperColsize : lowerColsize;
+			for (var i=0;i&lt;thisSize;i++) 
+				singleCol.push(orig[c++]);
+			output.push(singleCol);
+		}
+
+		return output;
+	},
+
+	drawTable: function(place,columns,theClass) {
+		var newTable = createTiddlyElement(place,&quot;table&quot;,null,theClass);
+		var newTbody = createTiddlyElement(newTable,&quot;tbody&quot;);
+		var newTr = createTiddlyElement(newTbody,&quot;tr&quot;);
+		for (var j=0;j&lt;columns.length;j++) {
+			var colOutput = &quot;&quot;;
+			for (var i=0;i&lt;columns[j].length;i++) 
+				colOutput += columns[j][i];
+			var newTd = createTiddlyElement(newTr,&quot;td&quot;,null,&quot;tagglyTagging&quot;); // todo should not need this class
+			wikify(colOutput,newTd);
+		}
+		return newTable;
+	},
+
+	createTagglyList: function(place,title,isTagExpr) {
+		switch(this.getTagglyOpt(title,&quot;listMode&quot;)) {
+			case &quot;group&quot;:  return this.createTagglyListGrouped(place,title,isTagExpr); break;
+			case &quot;normal&quot;: return this.createTagglyListNormal(place,title,false,isTagExpr); break;
+			case &quot;commas&quot;: return this.createTagglyListNormal(place,title,true,isTagExpr); break;
+			case &quot;sitemap&quot;:return this.createTagglyListSiteMap(place,title,isTagExpr); break;
+		}
+	},
+
+	getTaggingCount: function(title,isTagExpr) {
+		// thanks to Doug Edmunds
+		if (this.config.showTaggingCounts) {
+			var tagCount = config.taggly.getTiddlers(title,'title',isTagExpr).length;
+			if (tagCount &gt; 0)
+				return &quot; (&quot;+tagCount+&quot;)&quot;;
+		}
+		return &quot;&quot;;
+	},
+
+	getTiddlers: function(titleOrExpr,sortBy,isTagExpr) {
+		return isTagExpr ? store.getTiddlersByTagExpr(titleOrExpr,sortBy) : store.getTaggedTiddlers(titleOrExpr,sortBy);
+	},
+
+	getExcerpt: function(inTiddlerTitle,title,indent) {
+		if (!indent)
+			indent = 1;
+
+		var displayMode = this.getTagglyOpt(inTiddlerTitle,&quot;excerpts&quot;);
+		var t = store.getTiddler(title);
+
+		if (t &amp;&amp; displayMode == &quot;excerpts&quot;) {
+			var text = t.text.replace(/\n/,&quot; &quot;);
+			var marker = text.indexOf(this.config.excerptMarker);
+			if (marker != -1) {
+				return &quot; {{excerpt{&lt;nowiki&gt;&quot; + text.substr(0,marker) + &quot;&lt;/nowiki&gt;}}}&quot;;
+			}
+			else if (text.length &lt; this.config.excerptSize) {
+				return &quot; {{excerpt{&lt;nowiki&gt;&quot; + t.text + &quot;&lt;/nowiki&gt;}}}&quot;;
+			}
+			else {
+				return &quot; {{excerpt{&lt;nowiki&gt;&quot; + t.text.substr(0,this.config.excerptSize) + &quot;...&quot; + &quot;&lt;/nowiki&gt;}}}&quot;;
+			}
+		}
+		else if (t &amp;&amp; displayMode == &quot;contents&quot;) {
+			return &quot;\n{{contents indent&quot;+indent+&quot;{\n&quot; + t.text + &quot;\n}}}&quot;;
+		}
+		else if (t &amp;&amp; displayMode == &quot;sliders&quot;) {
+			return &quot;&lt;slider slide&gt;\n{{contents{\n&quot; + t.text + &quot;\n}}}\n&lt;/slider&gt;&quot;;
+		}
+		else if (t &amp;&amp; displayMode == &quot;descr&quot;) {
+			var descr = store.getTiddlerSlice(title,'Description');
+			return descr ? &quot; {{excerpt{&quot; + descr  + &quot;}}}&quot; : &quot;&quot;;
+		}
+		else if (t &amp;&amp; displayMode == &quot;slices&quot;) {
+			var result = &quot;&quot;;
+			var slices = store.calcAllSlices(title);
+			for (var s in slices)
+				result += &quot;|%0|&lt;nowiki&gt;%1&lt;/nowiki&gt;|\n&quot;.format([s,slices[s]]);
+			return result ? &quot;\n{{excerpt excerptIndent{\n&quot; + result  + &quot;}}}&quot; : &quot;&quot;;
+		}
+		return &quot;&quot;;
+	},
+
+	notHidden: function(t,inTiddler) {
+		if (typeof t == &quot;string&quot;) 
+			t = store.getTiddler(t);
+		return (!t || !t.tags.containsAny(this.config.excludeTags) ||
+				(inTiddler &amp;&amp; this.config.excludeTags.contains(inTiddler)));
+	},
+
+	// this is for normal and commas mode
+	createTagglyListNormal: function(place,title,useCommas,isTagExpr) {
+
+		var list = config.taggly.getTiddlers(title,this.getTagglyOpt(title,&quot;sortBy&quot;),isTagExpr);
+
+		if (this.getTagglyOpt(title,&quot;sortOrder&quot;) == &quot;desc&quot;)
+			list = list.reverse();
+
+		var output = [];
+		var first = true;
+		for (var i=0;i&lt;list.length;i++) {
+			if (this.notHidden(list[i],title)) {
+				var countString = this.getTaggingCount(list[i].title);
+				var excerpt = this.getExcerpt(title,list[i].title);
+				if (useCommas)
+					output.push((first ? &quot;&quot; : &quot;, &quot;) + &quot;[[&quot; + list[i].title + &quot;]]&quot; + countString + excerpt);
+				else
+					output.push(&quot;*[[&quot; + list[i].title + &quot;]]&quot; + countString + excerpt + &quot;\n&quot;);
+
+				first = false;
+			}
+		}
+
+		return this.drawTable(place,
+			this.makeColumns(output,useCommas ? 1 : parseInt(this.getTagglyOpt(title,&quot;numCols&quot;))),
+			useCommas ? &quot;commas&quot; : &quot;normal&quot;);
+	},
+
+	// this is for the &quot;grouped&quot; mode
+	createTagglyListGrouped: function(place,title,isTagExpr) {
+		var sortBy = this.getTagglyOpt(title,&quot;sortBy&quot;);
+		var sortOrder = this.getTagglyOpt(title,&quot;sortOrder&quot;);
+
+		var list = config.taggly.getTiddlers(title,sortBy,isTagExpr);
+
+		if (sortOrder == &quot;desc&quot;)
+			list = list.reverse();
+
+		var leftOvers = []
+		for (var i=0;i&lt;list.length;i++)
+			leftOvers.push(list[i].title);
+
+		var allTagsHolder = {};
+		for (var i=0;i&lt;list.length;i++) {
+			for (var j=0;j&lt;list[i].tags.length;j++) {
+
+				if (list[i].tags[j] != title) { // not this tiddler
+
+					if (this.notHidden(list[i].tags[j],title)) {
+
+						if (!allTagsHolder[list[i].tags[j]])
+							allTagsHolder[list[i].tags[j]] = &quot;&quot;;
+
+						if (this.notHidden(list[i],title)) {
+							allTagsHolder[list[i].tags[j]] += &quot;**[[&quot;+list[i].title+&quot;]]&quot;
+										+ this.getTaggingCount(list[i].title) + this.getExcerpt(title,list[i].title) + &quot;\n&quot;;
+
+							leftOvers.setItem(list[i].title,-1); // remove from leftovers. at the end it will contain the leftovers
+
+						}
+					}
+				}
+			}
+		}
+
+		var allTags = [];
+		for (var t in allTagsHolder)
+			allTags.push(t);
+
+		var sortHelper = function(a,b) {
+			if (a == b) return 0;
+			if (a &lt; b) return -1;
+			return 1;
+		};
+
+		allTags.sort(function(a,b) {
+			var tidA = store.getTiddler(a);
+			var tidB = store.getTiddler(b);
+			if (sortBy == &quot;title&quot;) return sortHelper(a,b);
+			else if (!tidA &amp;&amp; !tidB) return 0;
+			else if (!tidA) return -1;
+			else if (!tidB) return +1;
+			else return sortHelper(tidA[sortBy],tidB[sortBy]);
+		});
+
+		var leftOverOutput = &quot;&quot;;
+		for (var i=0;i&lt;leftOvers.length;i++)
+			if (this.notHidden(leftOvers[i],title))
+				leftOverOutput += &quot;*[[&quot;+leftOvers[i]+&quot;]]&quot; + this.getTaggingCount(leftOvers[i]) + this.getExcerpt(title,leftOvers[i]) + &quot;\n&quot;;
+
+		var output = [];
+
+		if (sortOrder == &quot;desc&quot;)
+			allTags.reverse();
+		else if (leftOverOutput != &quot;&quot;)
+			// leftovers first...
+			output.push(leftOverOutput);
+
+		for (var i=0;i&lt;allTags.length;i++)
+			if (allTagsHolder[allTags[i]] != &quot;&quot;)
+				output.push(&quot;*[[&quot;+allTags[i]+&quot;]]&quot; + this.getTaggingCount(allTags[i]) + this.getExcerpt(title,allTags[i]) + &quot;\n&quot; + allTagsHolder[allTags[i]]);
+
+		if (sortOrder == &quot;desc&quot; &amp;&amp; leftOverOutput != &quot;&quot;)
+			// leftovers last...
+			output.push(leftOverOutput);
+
+		return this.drawTable(place,
+				this.makeColumns(output,parseInt(this.getTagglyOpt(title,&quot;numCols&quot;))),
+				&quot;grouped&quot;);
+
+	},
+
+	// used to build site map
+	treeTraverse: function(title,depth,sortBy,sortOrder,isTagExpr) {
+
+		var list = config.taggly.getTiddlers(title,sortBy,isTagExpr);
+
+		if (sortOrder == &quot;desc&quot;)
+			list.reverse();
+
+		var indent = &quot;&quot;;
+		for (var j=0;j&lt;depth;j++)
+			indent += &quot;*&quot;
+
+		var childOutput = &quot;&quot;;
+
+		if (depth &gt; this.config.siteMapDepthLimit)
+			childOutput += indent + this.lingo.tooDeepMessage + &quot;\n&quot;;
+		else
+			for (var i=0;i&lt;list.length;i++)
+				if (list[i].title != title)
+					if (this.notHidden(list[i].title,this.config.inTiddler))
+						childOutput += this.treeTraverse(list[i].title,depth+1,sortBy,sortOrder,false);
+
+		if (depth == 0)
+			return childOutput;
+		else
+			return indent + &quot;[[&quot;+title+&quot;]]&quot; + this.getTaggingCount(title) + this.getExcerpt(this.config.inTiddler,title,depth) + &quot;\n&quot; + childOutput;
+	},
+
+	// this if for the site map mode
+	createTagglyListSiteMap: function(place,title,isTagExpr) {
+		this.config.inTiddler = title; // nasty. should pass it in to traverse probably
+		var output = this.treeTraverse(title,0,this.getTagglyOpt(title,&quot;sortBy&quot;),this.getTagglyOpt(title,&quot;sortOrder&quot;),isTagExpr);
+		return this.drawTable(place,
+				this.makeColumns(output.split(/(?=^\*\[)/m),parseInt(this.getTagglyOpt(title,&quot;numCols&quot;))), // regexp magic
+				&quot;sitemap&quot;
+				);
+	},
+
+	macros: {
+		tagglyTagging: {
+			handler: function (place,macroName,params,wikifier,paramString,tiddler) {
+				var parsedParams = paramString.parseParams(&quot;tag&quot;,null,true);
+				var refreshContainer = createTiddlyElement(place,&quot;div&quot;);
+
+				// do some refresh magic to make it keep the list fresh - thanks Saq
+				refreshContainer.setAttribute(&quot;refresh&quot;,&quot;macro&quot;);
+				refreshContainer.setAttribute(&quot;macroName&quot;,macroName);
+
+				var tag = getParam(parsedParams,&quot;tag&quot;);
+				var expr = getParam(parsedParams,&quot;expr&quot;);
+
+				if (expr) {
+					refreshContainer.setAttribute(&quot;isTagExpr&quot;,&quot;true&quot;);
+					refreshContainer.setAttribute(&quot;title&quot;,expr);
+					refreshContainer.setAttribute(&quot;showEmpty&quot;,&quot;true&quot;);
+				}
+				else {
+					refreshContainer.setAttribute(&quot;isTagExpr&quot;,&quot;false&quot;);
+					if (tag) {
+        				refreshContainer.setAttribute(&quot;title&quot;,tag);
+						refreshContainer.setAttribute(&quot;showEmpty&quot;,&quot;true&quot;);
+					}
+					else {
+        				refreshContainer.setAttribute(&quot;title&quot;,tiddler.title);
+						refreshContainer.setAttribute(&quot;showEmpty&quot;,&quot;false&quot;);
+					}
+				}
+				this.refresh(refreshContainer);
+			},
+
+			refresh: function(place) {
+				var title = place.getAttribute(&quot;title&quot;);
+				var isTagExpr = place.getAttribute(&quot;isTagExpr&quot;) == &quot;true&quot;;
+				var showEmpty = place.getAttribute(&quot;showEmpty&quot;) == &quot;true&quot;;
+				removeChildren(place);
+				addClass(place,&quot;tagglyTagging&quot;);
+				var countFound = config.taggly.getTiddlers(title,'title',isTagExpr).length
+				if (countFound &gt; 0 || showEmpty) {
+					var lingo = config.taggly.lingo;
+					config.taggly.createListControl(place,title,&quot;hideState&quot;);
+					if (config.taggly.getTagglyOpt(title,&quot;hideState&quot;) == &quot;show&quot;) {
+						createTiddlyElement(place,&quot;span&quot;,null,&quot;tagglyLabel&quot;,
+								isTagExpr ? lingo.labels.exprLabel.format([title]) : lingo.labels.label.format([title]));
+						config.taggly.createListControl(place,title,&quot;title&quot;);
+						config.taggly.createListControl(place,title,&quot;modified&quot;);
+						config.taggly.createListControl(place,title,&quot;created&quot;);
+						config.taggly.createListControl(place,title,&quot;listMode&quot;);
+						config.taggly.createListControl(place,title,&quot;excerpts&quot;);
+						config.taggly.createListControl(place,title,&quot;numCols&quot;);
+						config.taggly.createTagglyList(place,title,isTagExpr);
+						if (countFound == 0 &amp;&amp; showEmpty)
+							createTiddlyElement(place,&quot;div&quot;,null,&quot;tagglyNoneFound&quot;,lingo.labels.noneFound);
+					}
+				}
+			}
+		}
+	},
+
+	// todo fix these up a bit
+	styles: [
+&quot;/*{{{*/&quot;,
+&quot;/* created by TagglyTaggingPlugin */&quot;,
+&quot;.tagglyTagging { padding-top:0.5em; }&quot;,
+&quot;.tagglyTagging li.listTitle { display:none; }&quot;,
+&quot;.tagglyTagging ul {&quot;,
+&quot;	margin-top:0px; padding-top:0.5em; padding-left:2em;&quot;,
+&quot;	margin-bottom:0px; padding-bottom:0px;&quot;,
+&quot;}&quot;,
+&quot;.tagglyTagging { vertical-align: top; margin:0px; padding:0px; }&quot;,
+&quot;.tagglyTagging table { margin:0px; padding:0px; }&quot;,
+&quot;.tagglyTagging .button { visibility:hidden; margin-left:3px; margin-right:3px; }&quot;,
+&quot;.tagglyTagging .button, .tagglyTagging .hidebutton {&quot;,
+&quot;	color:[[ColorPalette::TertiaryLight]]; font-size:90%;&quot;,
+&quot;	border:0px; padding-left:0.3em;padding-right:0.3em;&quot;,
+&quot;}&quot;,
+&quot;.tagglyTagging .button:hover, .hidebutton:hover, &quot;,
+&quot;.tagglyTagging .button:active, .hidebutton:active  {&quot;,
+&quot;	border:0px; background:[[ColorPalette::TertiaryPale]]; color:[[ColorPalette::TertiaryDark]];&quot;,
+&quot;}&quot;,
+&quot;.selected .tagglyTagging .button { visibility:visible; }&quot;,
+&quot;.tagglyTagging .hidebutton { color:[[ColorPalette::Background]]; }&quot;,
+&quot;.selected .tagglyTagging .hidebutton { color:[[ColorPalette::TertiaryLight]] }&quot;,
+&quot;.tagglyLabel { color:[[ColorPalette::TertiaryMid]]; font-size:90%; }&quot;,
+&quot;.tagglyTagging ul {padding-top:0px; padding-bottom:0.5em; margin-left:1em; }&quot;,
+&quot;.tagglyTagging ul ul {list-style-type:disc; margin-left:-1em;}&quot;,
+&quot;.tagglyTagging ul ul li {margin-left:0.5em; }&quot;,
+&quot;.editLabel { font-size:90%; padding-top:0.5em; }&quot;,
+&quot;.tagglyTagging .commas { padding-left:1.8em; }&quot;,
+&quot;/* not technically tagglytagging but will put them here anyway */&quot;,
+&quot;.tagglyTagged li.listTitle { display:none; }&quot;,
+&quot;.tagglyTagged li { display: inline; font-size:90%; }&quot;,
+&quot;.tagglyTagged ul { margin:0px; padding:0px; }&quot;,
+&quot;.excerpt { color:[[ColorPalette::TertiaryDark]]; }&quot;,
+&quot;.excerptIndent { margin-left:4em; }&quot;,
+&quot;div.tagglyTagging table,&quot;,
+&quot;div.tagglyTagging table tr,&quot;,
+&quot;td.tagglyTagging&quot;,
+&quot; {border-style:none!important; }&quot;,
+&quot;.tagglyTagging .contents { border-bottom:2px solid [[ColorPalette::TertiaryPale]]; padding:0 1em 1em 0.5em;&quot;,
+&quot;  margin-bottom:0.5em; }&quot;,
+&quot;.tagglyTagging .indent1  { margin-left:3em;  }&quot;,
+&quot;.tagglyTagging .indent2  { margin-left:4em;  }&quot;,
+&quot;.tagglyTagging .indent3  { margin-left:5em;  }&quot;,
+&quot;.tagglyTagging .indent4  { margin-left:6em;  }&quot;,
+&quot;.tagglyTagging .indent5  { margin-left:7em;  }&quot;,
+&quot;.tagglyTagging .indent6  { margin-left:8em;  }&quot;,
+&quot;.tagglyTagging .indent7  { margin-left:9em;  }&quot;,
+&quot;.tagglyTagging .indent8  { margin-left:10em; }&quot;,
+&quot;.tagglyTagging .indent9  { margin-left:11em; }&quot;,
+&quot;.tagglyTagging .indent10 { margin-left:12em; }&quot;,
+&quot;.tagglyNoneFound { margin-left:2em; color:[[ColorPalette::TertiaryMid]]; font-size:90%; font-style:italic; }&quot;,
+&quot;/*}}}*/&quot;,
+		&quot;&quot;].join(&quot;\n&quot;),
+
+	init: function() {
+		merge(config.macros,this.macros);
+		config.shadowTiddlers[&quot;TagglyTaggingStyles&quot;] = this.styles;
+		store.addNotification(&quot;TagglyTaggingStyles&quot;,refreshStyles);
+	}
+};
+
+config.taggly.init();
+
+//}}}
+
+/***
+InlineSlidersPlugin
+By Saq Imtiaz
+http://tw.lewcid.org/sandbox/#InlineSlidersPlugin
+
+// syntax adjusted to not clash with NestedSlidersPlugin
+// added + syntax to start open instead of closed
+
+***/
+//{{{
+config.formatters.unshift( {
+	name: &quot;inlinesliders&quot;,
+	// match: &quot;\\+\\+\\+\\+|\\&lt;slider&quot;,
+	match: &quot;\\&lt;slider&quot;,
+	// lookaheadRegExp: /(?:\+\+\+\+|&lt;slider) (.*?)(?:&gt;?)\n((?:.|\n)*?)\n(?:====|&lt;\/slider&gt;)/mg,
+	lookaheadRegExp: /(?:&lt;slider)(\+?) (.*?)(?:&gt;)\n((?:.|\n)*?)\n(?:&lt;\/slider&gt;)/mg,
+	handler: function(w) {
+		this.lookaheadRegExp.lastIndex = w.matchStart;
+		var lookaheadMatch = this.lookaheadRegExp.exec(w.source)
+		if(lookaheadMatch &amp;&amp; lookaheadMatch.index == w.matchStart ) {
+			var btn = createTiddlyButton(w.output,lookaheadMatch[2] + &quot; &quot;+&quot;\u00BB&quot;,lookaheadMatch[2],this.onClickSlider,&quot;button sliderButton&quot;);
+			var panel = createTiddlyElement(w.output,&quot;div&quot;,null,&quot;sliderPanel&quot;);
+			panel.style.display = (lookaheadMatch[1] == '+' ? &quot;block&quot; : &quot;none&quot;);
+			wikify(lookaheadMatch[3],panel);
+			w.nextMatch = lookaheadMatch.index + lookaheadMatch[0].length;
+		}
+   },
+   onClickSlider : function(e) {
+		if(!e) var e = window.event;
+		var n = this.nextSibling;
+		n.style.display = (n.style.display==&quot;none&quot;) ? &quot;block&quot; : &quot;none&quot;;
+		return false;
+	}
+});
+
+//}}}
+
+</pre>
+</div>
+<div title="ToggleTagPlugin" modifier="MPTW" modified="201009151231" created="201004041418" tags="systemConfig">
+<pre>/***
+|Name:|ToggleTagPlugin|
+|Description:|Makes a checkbox which toggles a tag in a tiddler|
+|Version:|3.1.0 ($Rev: 4907 $)|
+|Date:|$Date: 2008-05-13 03:15:46 +1000 (Tue, 13 May 2008) $|
+|Source:|http://mptw.tiddlyspot.com/#ToggleTagPlugin|
+|Author:|Simon Baird &lt;simon.baird@gmail.com&gt;|
+|License:|http://mptw.tiddlyspot.com/#TheBSDLicense|
+!!Usage
+{{{&lt;&lt;toggleTag }}}//{{{TagName TiddlerName LabelText}}}//{{{&gt;&gt;}}}
+* TagName - the tag to be toggled, default value &quot;checked&quot;
+* TiddlerName - the tiddler to toggle the tag in, default value the current tiddler
+* LabelText - the text (gets wikified) to put next to the check box, default value is '{{{[[TagName]]}}}' or '{{{[[TagName]] [[TiddlerName]]}}}'
+(If a parameter is '.' then the default will be used)
+* TouchMod flag - if non empty then touch the tiddlers mod date. Note, can set config.toggleTagAlwaysTouchModDate to always touch mod date
+!!Examples
+|Code|Description|Example|h
+|{{{&lt;&lt;toggleTag&gt;&gt;}}}|Toggles the default tag (checked) in this tiddler|&lt;&lt;toggleTag&gt;&gt;|
+|{{{&lt;&lt;toggleTag TagName&gt;&gt;}}}|Toggles the TagName tag in this tiddler|&lt;&lt;toggleTag TagName&gt;&gt;|
+|{{{&lt;&lt;toggleTag TagName TiddlerName&gt;&gt;}}}|Toggles the TagName tag in the TiddlerName tiddler|&lt;&lt;toggleTag TagName TiddlerName&gt;&gt;|
+|{{{&lt;&lt;toggleTag TagName TiddlerName 'click me'&gt;&gt;}}}|Same but with custom label|&lt;&lt;toggleTag TagName TiddlerName 'click me'&gt;&gt;|
+|{{{&lt;&lt;toggleTag . . 'click me'&gt;&gt;}}}|dot means use default value|&lt;&lt;toggleTag . . 'click me'&gt;&gt;|
+!!Notes
+* If TiddlerName doesn't exist it will be silently created
+* Set label to '-' to specify no label
+* See also http://mgtd-alpha.tiddlyspot.com/#ToggleTag2
+!!Known issues
+* Doesn't smoothly handle the case where you toggle a tag in a tiddler that is current open for editing
+* Should convert to use named params
+***/
+//{{{
+
+if (config.toggleTagAlwaysTouchModDate == undefined) config.toggleTagAlwaysTouchModDate = false;
+
+merge(config.macros,{
+
+	toggleTag: {
+
+		createIfRequired: true,
+		shortLabel: &quot;[[%0]]&quot;,
+		longLabel: &quot;[[%0]] [[%1]]&quot;,
+
+		handler: function(place,macroName,params,wikifier,paramString,tiddler) {
+			var tiddlerTitle = tiddler ? tiddler.title : '';
+			var tag   = (params[0] &amp;&amp; params[0] != '.') ? params[0] : &quot;checked&quot;;
+			var title = (params[1] &amp;&amp; params[1] != '.') ? params[1] : tiddlerTitle;
+			var defaultLabel = (title == tiddlerTitle ? this.shortLabel : this.longLabel);
+			var label = (params[2] &amp;&amp; params[2] != '.') ? params[2] : defaultLabel;
+			var touchMod = (params[3] &amp;&amp; params[3] != '.') ? params[3] : &quot;&quot;;
+			label = (label == '-' ? '' : label); // dash means no label
+			var theTiddler = (title == tiddlerTitle ? tiddler : store.getTiddler(title));
+			var cb = createTiddlyCheckbox(place, label.format([tag,title]), theTiddler &amp;&amp; theTiddler.isTagged(tag), function(e) {
+				if (!store.tiddlerExists(title)) {
+					if (config.macros.toggleTag.createIfRequired) {
+						var content = store.getTiddlerText(title); // just in case it's a shadow
+						store.saveTiddler(title,title,content?content:&quot;&quot;,config.options.txtUserName,new Date(),null);
+					}
+					else 
+						return false;
+				}
+				if ((touchMod != &quot;&quot; || config.toggleTagAlwaysTouchModDate) &amp;&amp; theTiddler)
+						theTiddler.modified = new Date();
+				store.setTiddlerTag(title,this.checked,tag);
+				return true;
+			});
+		}
+	}
+});
+
+//}}}
+
+</pre>
+</div>
+<div title="systemConfig" modifier="MPTW" modified="201009151231" created="201009151231" taggly.excerpts="descr" taggly.sortby="created" taggly.sortorder="desc">
+<pre></pre>
+</div>
+</tiddlers>

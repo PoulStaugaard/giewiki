@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<tiddler tags="help" title="Help On CSS Formatting" modified="20101201100819" modifier="giewiki" version="0">
+<pre>!!Inline Styles
+Apply CSS properties inline:
+{{{
+@@color:#4bbbbb;Some random text@@
+}}}
+Displays as:
+@@color:#4bbbbb;Some random text@@
+!!CSS classes
+CSS classes can be applied to text blocks or runs. This form creates an HTML {{{&lt;span&gt;}}}:
+{{{
+{{customClassName{Some random text}}}
+}}}
+Displays as:
+{{customClassName{Some random text}}}
+This form generates an HTML {{{&lt;div&gt;}}}:
+{{{
+ {{customClassName{
+ Some random text
+ }}}
+}}}
+Displays as:
+{{customClassName{
+Some random text
+}}}
+</pre>
+</tiddler>

@@ -1,0 +1,50 @@
+<?xml version="1.0" ?><tiddlers><tiddler id="5c765ba5-80e4-4825-88b9-d9eea75290f1" modified="20110715210241" modifier="giewiki" tags="" title="Python list insert semantics" ><pre>The semanticts of the optional //position// parameter to promote and announce is:
+|0|Insert at the top|
+|n (positive number)|Insert after the n'th existing element|
+|-n (negative number|Insert before the n'th existing element //from the bottom//|</pre></tiddler><tiddler id="ae09ca73-8123-4d57-ae2b-6b344ebb887f" modified="20110715211538" modifier="giewiki" tags="" title="promote (special tag)"><pre>Adding the ''promote'' attribute tag to a tiddler, like in
+{{{
+@promote@2011-08-20
+}}}
+will add it to the DefaultTiddlers (that are presented in the story column when the page is loaded) on the specified date (//provided that the DefaultTiddlers tiddler already exists//). If the tiddler has the //deprecated// attribute, this attribute is removed at the same time. 
+
+In addition, you may append a second parameter, also separated by a @, being the zero-based position in the DefaultTiddlers list at which it should be inserted, using [[Python list insert semantics]].
+
+To remove a tiddler from the DefaultTiddlers list at a specified date/time, use either the [[demote|demote (special tag)]] or the [[deprecate|deprecate (special tag)]] tag.</pre></tiddler><tiddler id="e7a0ef37-ae1c-424a-8741-d8a030f057ac" modified="20110715212752" modifier="giewiki" tags="" title="Help On Timing" ><pre>Using special tags, you can schedule various changes to a page to occur at specific times (GMT). These tags are hidden unless the page is editable to you:
+!!Presence
+A set of attributes (special tags) allow you to add tiddlers to (//''or remove from)''//  the page and it's DefaultTiddlers or MainMenu lists at a specified future time. Each of these timing tags take the form:
+ 
+@action@YYYY-MM-DD
+
+specifying year-month-date of the action, or, to specify also the precise hour:
+
+@action@YYYY-MM-DD-hh
+
+The available choices for //action// are [[announce|announce (special tag)]], [[promote|promote (special tag)]], [[demote|demote (special tag)]] and [[deprecate|deprecate (special tag)]].
+!!Changing tiddler content by switching current version
+The [[revert|revert (special tag)]] tag allows you to schedule a switch of current version of the tiddler to which it is applied.</pre></tiddler><tiddler id="abfd28e6-e880-46aa-9749-27de53629e3c" modified="20110715212838" modifier="giewiki" tags="" title="announce (special tag)"><pre>Adding the ''announce'' attribute tag to a tiddler, like in
+{{{
+@announce@2011-08-20
+}}}
+will cause it to be added to the MainMenu on the specified date (//provided that the MainMenu tiddler already exists//). If he tiddler has the //deprecated// attribute, this attribute is removed at the same time. 
+
+In addition, you may append a second parameter, also separated by a @, being the zero-based position in the MainMenu list at which it should be inserted, using [[Python list insert semantics]].
+
+To remove a tiddler from the MainMenu list at a specified date/time, use either the [[demote]] or the [[deprecate]] tag.</pre></tiddler><tiddler id="ae4de2fc-fed9-402a-ae73-15622f2d420f" locked="true" modified="20110715150300" modifier="giewiki" tags="" title="deprecate (special tag)"><pre>Adding the ''deprecate'' attribute tag to a tiddler, like in
+{{{
+@deprecate@2011-09-20
+}}}
+will cause it to be removed from the MainMenu and/or the DefaultTiddlers on the specified date. At the same time, it will be assigned the ''isDeprecated'' attribute which has the effect that it will no longer be loaded as part of the page. Links to the tiddler will still work, though.
+</pre></tiddler><tiddler id="53aad354-0651-4b4c-8856-3567cb1efe3b" locked="true" modified="20110715142900" modifier="test@example.com" tags="" title="demote (special tag)" ><pre>Adding the demote tag to a tiddler, like in
+{{{
+@demote@2011-08-20
+}}}
+will cause it to be removed from the MainMenu and/or the DefaultTiddlers on the specified date. It will continue to be loaded as part the page and be available via the index (unless it has the excludeLists tag). To remove it entirely, use the [[deprecate|deprecate (special tag)]] tag in stead.
+</pre></tiddler>
+<tiddler id="2e4652e1-5ba8-4adc-bc15-36f003c94cb6" modified="20110717104951" modifier="giewiki" tags="help" title="revert (special tag)"><pre>Adding the ''revert'' attribute tag to a tiddler, like in
+{{{
+@revert@2011-09-20@2
+}}}
+will cause the current version of tiddler to be switched at a specified future time. The parameters are:
+|@yyyy-mm-dd //or// @yyyy-mm-dd-hh&lt;br&gt;//required//|Specified when the change should happen (year,month,date and optionally hour)|
+|@n&lt;br&gt;//optional//|Specifies the version (//n// being a number) that should become the current version. If this parameter is omitted, the version prior to the current version is assumed.|</pre></tiddler>
+</tiddlers>

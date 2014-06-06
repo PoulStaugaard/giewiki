@@ -1,0 +1,263 @@
+<?xml version="1.0" ?><document><storeArea><div modified="20101230165430" modifier="giewiki" tags="systemConfig excludeSearch excludeLists" title="GiewikiAdaptor" ><pre>//{{{
+//--
+//-- Server adaptor for reaching giewiki pages from TiddlyWiki
+//--
+
+function GiewikiAdaptor()
+{
+}
+
+GiewikiAdaptor.prototype = new AdaptorBase();
+GiewikiAdaptor.serverType = 'giewiki';
+GiewikiAdaptor.serverLabel = 'giewiki';
+
+GiewikiAdaptor.loadTiddlyWikiCallback = function(status,context,responseText,url,xhr)
+{
+	context.status = status;
+	if(!status) {
+		context.statusText = &quot;Error reading file&quot;;
+	} else {
+		context.adaptor.store = new TiddlyWiki();
+		if(!context.adaptor.store.importTiddlyWiki(responseText)) {
+			context.statusText = config.messages.invalidFileError.format([url]);
+			context.status = false;
+		}
+	}
+	context.complete(context,context.userParams);
+};
+
+// Get the list of workspaces on a given server
+GiewikiAdaptor.prototype.getWorkspaceList = function(context,userParams,callback)
+{
+	context = this.setContext(context,userParams,callback);
+	context.workspaces = [{title:&quot;(default)&quot;}];
+	context.status = true;
+	if(callback)
+		window.setTimeout(function() {callback(context,userParams);},10);
+	return true;
+};
+
+// Gets the list of tiddlers within a given workspace
+GiewikiAdaptor.prototype.getTiddlerList = function(context,userParams,callback,filter)
+{
+	context = this.setContext(context,userParams,callback);
+	if(!context.filter)
+		context.filter = filter;
+	context.complete = GiewikiAdaptor.getTiddlerListComplete;
+
+	if(this.store) {
+		var ret = context.complete(context,context.userParams);
+	} else {
+		ret = loadRemoteFile(context.host + (context.host.indexOf('?') == -1 ? '?' : '&amp;') + 'rat=' + config.options.rat,GiewikiAdaptor.loadTiddlyWikiCallback,context);
+	if(typeof ret != &quot;string&quot;)
+			ret = true;
+	}
+	return ret;
+};
+
+GiewikiAdaptor.getTiddlerListComplete = function(context,userParams)
+{
+	if(context.status) {
+		if(context.filter) {
+			context.tiddlers = context.adaptor.store.filterTiddlers(context.filter);
+		} else {
+			context.tiddlers = [];
+			context.adaptor.store.forEachTiddler(function(title,tiddler) {context.tiddlers.push(tiddler);});
+		}
+
+		for(var i=0; i&lt;context.tiddlers.length; i++) {
+			context.tiddlers[i].fields['server.type'] = GiewikiAdaptor.serverType;
+			context.tiddlers[i].fields['server.host'] = AdaptorBase.minHostName(context.host);
+		}
+
+		context.status = true;
+	}
+
+	if(context.callback) {
+		window.setTimeout(function() {context.callback(context,userParams);},10);
+	}
+
+	return true;
+};
+
+GiewikiAdaptor.prototype.generateTiddlerInfo = function(tiddler)
+{
+	var info = {};
+	info.uri = tiddler.fields['server.host'] + &quot;#&quot; + tiddler.title;
+	return info;
+};
+
+// Retrieve a tiddler from a given workspace on a given server
+GiewikiAdaptor.prototype.getTiddler = function(title,context,userParams,callback)
+{
+	context = this.setContext(context,userParams,callback);
+	context.title = title;
+	context.complete = GiewikiAdaptor.getTiddlerComplete;
+	return context.adaptor.store ?
+		context.complete(context,context.userParams) :
+		loadRemoteFile(context.host,FileAdaptor.loadTiddlyWikiCallback,context);
+};
+
+GiewikiAdaptor.getTiddlerComplete = function(context,userParams)
+{
+	var t = context.adaptor.store.fetchTiddler(context.title);
+	if(t) {
+		t.fields['server.type'] = GiewikiAdaptor.serverType;
+		t.fields['server.host'] = AdaptorBase.minHostName(context.host);
+		context.tiddler = t;
+		context.status = true;
+	} else { //# tiddler does not exist in document
+		context.status = false;
+	}
+
+	if(context.allowSynchronous) {
+		context.isSynchronous = true;
+		context.callback(context,userParams);
+	} else {
+		window.setTimeout(function() {context.callback(context,userParams);},10);
+	}
+	return true;
+};
+
+GiewikiAdaptor.prototype.putTiddler = function(tiddler,context,userParams,callback)
+{
+	tiddler.tiddlerId = tiddler.fields.id;
+	tiddler.currentVer = tiddler.fields.version;
+	context = this.setContext(context,userParams,callback);
+	var res = HttpGet(tiddler,'uploadTiddler',userParams.serverHost.split('?')[0]);
+	if (res &amp;&amp; res.errorcode &gt; 0) {
+		tiddler.currentVer = res.version;
+		tiddler.fields.id = res.id
+		if (res.modified)
+			tiddler.fields['server.page.revision'] = res.modified;
+		callback(context,userParams);
+		tiddler.fields['changecount'] = 0;
+		return true;
+	}
+	return false;
+};
+
+GiewikiAdaptor.prototype.close = function()
+{
+	delete this.store;
+	this.store = null;
+};
+
+config.adaptors[GiewikiAdaptor.serverType] = GiewikiAdaptor;
+config.defaultAdaptor = GiewikiAdaptor.serverType;
+
+function JsoFromXml(rce) {
+	if (rce == null)
+		return null;
+	var v =  rce.childNodes.length ? rce.firstChild.nodeValue : '';
+	var type = rce.attributes.getNamedItem('type');
+	if (type != null &amp;&amp; type.value != null)
+		switch (type.value) {
+		case 'int':
+			v = parseInt(v);
+			break;
+		case 'bool':
+			v = window.eval(v);
+			break;
+		case 'datetime':
+			try {
+				v = Date.convertFromYYYYMMDDHHMM(v);
+			}
+			catch (e) {
+				alert(&quot;bad datetime: &quot; + v);
+			}
+			break;
+		case '[]':
+			v = [];
+			break;
+		case 'string[]':
+			v = [];
+			for (var ae = 0; ae &lt; rce.childNodes.length; ae++) {
+				var ace = rce.childNodes[ae];
+				v[ae] = ace.firstChild ? ace.firstChild.nodeValue : ace;
+			}
+			break;
+		case 'object':
+			v = {};
+			for (var ae = 0; ae &lt; rce.childNodes.length; ae++)
+				v[rce.childNodes[ae].nodeName] = JsoFromXml(rce.childNodes[ae]);
+			break;
+		case 'object[]':
+			v = [];
+			for (var ae = 0; ae &lt; rce.childNodes.length; ae++)
+				v[ae] = JsoFromXml(rce.childNodes[ae]);
+			break;
+		}
+	else if (rce.childNodes.length &amp;&amp; rce.firstChild.nodeType == 1) {
+		v = {};
+		for (var i = 0; i &lt; rce.childNodes.length; i++) {
+			var ace = rce.childNodes[i];
+			v[ace.nodeName] = JsoFromXml(ace);
+		}
+	}
+	return v;
+}
+
+function displayHTMLMessage(text) {
+	var ma = document.getElementById(&quot;messageArea&quot;);
+	if (ma &amp;&amp; ma.innerHTML.indexOf(text) &gt; 0)
+		return; // do not repeat
+	var e = getMessageDiv();
+	e.innerHTML = text;
+}
+
+function HttpReply(req) {
+	if (typeof(req) != &quot;object&quot;)
+		return req;
+	if (req.responseXML &amp;&amp; req.responseXML.documentElement)
+		return JsoFromXml(req.responseXML.documentElement);
+	else
+		return req.responseText;
+}
+
+function HttpGet(args, method, url) {
+	var fields = [];
+	if (method)
+		fields.push(&quot;method=&quot; + method);
+	for (var a in args) {
+		var v = args[a];
+		if (!(v == undefined || typeof(v) == &quot;function&quot;))
+			fields.push(a + &quot;=&quot; + encodeURIComponent(v));
+	}
+	var rs = HttpRequest(fields.join(&quot;&amp;&quot;), false, url);
+	var rp = HttpReply(rs);
+	if (rp &amp;&amp; rp.Message)
+		displayHTMLMessage(rp.Message);
+	return rp || rs;
+}
+
+function HttpRequest(args,debug,url) {
+	if (!url) 
+		url = window.location.pathname;
+
+	var req;
+	try { req = new XMLHttpRequest(); }
+	catch (e) {
+		try { req = new ActiveXObject(&quot;Msxml2.XMLHTTP&quot;) }
+		catch (e) {
+			try { req = new ActiveXObject(&quot;Microsoft.XMLHTTP&quot;) }
+			catch (e) { return }
+		}
+	}
+
+	req.open(&quot;POST&quot;, url, false);
+	req.setRequestHeader(&quot;Content-Type&quot;,&quot;application/x-www-form-urlencoded&quot;);
+
+	req.send(args);
+	if (req.status &gt;= 400)
+		return displayMessage(&quot;HttpRequest(&quot; + url + &quot;) failed: &quot; + req.status + &quot;&lt;br&gt;&quot; + req.responseText);
+	if (!(debug === undefined)) {
+		if (typeof(debug) == &quot;function&quot;)
+			debug(req);
+		else if (debug)
+			alert(req.responseText);
+	}
+	return req;
+}
+
+//}}}</pre></div></storeArea><shadowArea/></document>

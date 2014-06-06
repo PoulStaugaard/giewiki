@@ -1,0 +1,166 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{92C4352D-2183-4476-8B77-F3E6FA6FB9B0}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>giewiki</RootNamespace>
+    <AssemblyName>giewiki</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <TargetFrameworkProfile />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <ItemGroup>
+    <None Include="app.yaml" />
+    <None Include="cron.yaml" />
+    <None Include="index.yaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="AdvancedSearch.xml" />
+    <Content Include="build_tag_index.py" />
+    <Content Include="ExtScriptHelp.xml" />
+    <Content Include="GiewikiAdaptor.xml" />
+    <Content Include="giewikidb.py" />
+    <Content Include="Help On CSS Formatting.xml" />
+    <Content Include="Help On Font Styles.xml" />
+    <Content Include="Help on Links.xml" />
+    <Content Include="Help on Macros.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Help On Markup.xml" />
+    <Content Include="Help On Tables.xml" />
+    <Content Include="help-anonymous.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="help-authenticated.xml" />
+    <Content Include="iewiki.py" />
+    <Content Include="iewiki.xsl">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="index.py" />
+    <Content Include="Hello.py" />
+    <Content Include="javascripts.py" />
+    <Content Include="LibraryUsageHelp.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="library\MPTW.html" />
+    <Content Include="library\MPTW.xml" />
+    <Content Include="library\tiddlywiki.abego-software.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="library\YouTube.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="PageProperties.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="PagePropertiesScript.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="PageSearchFAQ.xml" />
+    <Content Include="PageTemplateHelp.xml" />
+    <Content Include="PluginManager.xml" />
+    <Content Include="empty.html" />
+    <Content Include="PublishPlugin.xml" />
+    <Content Include="readme.txt" />
+    <Content Include="scripts\jquery-1.5.1.min.js" />
+    <Content Include="scripts\modernizr-1.6.min.js" />
+    <Content Include="SearchHistory.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="static\favicon.ico" />
+    <Content Include="static\iewiki.js" />
+    <Content Include="static\iewiki.xsl">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="static\inlinescript.htm" />
+    <Content Include="static\inlinescript.js" />
+    <Content Include="static\minusDoc36.png" />
+    <Content Include="static\minusFolder36.png" />
+    <Content Include="static\minusTiddler36.png" />
+    <Content Include="static\plusDoc36.png" />
+    <Content Include="static\plusFolder36.png" />
+    <Content Include="static\plusTiddler36.png" />
+    <Content Include="static\scratch.htm" />
+    <Content Include="static\scratch.js" />
+    <Content Include="static\upload.js" />
+    <Content Include="static\UploadDialog.htm" />
+    <Content Include="every_hour.py" />
+    <Content Include="twcomp.html" />
+    <Content Include="UploadDialog.htm" />
+    <Content Include="SpecialTiddlers.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="page-setup-first.xml" />
+    <Content Include="UploadHandler.py" />
+    <Content Include="UploadTiddlers.htm" />
+    <Content Include="UserProfile.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+</Project>

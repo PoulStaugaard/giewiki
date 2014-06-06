@@ -1,0 +1,20 @@
+<?xml version="1.0" ?><tiddlers><tiddler modified="20120826084227" modifier="giewiki" tags="" title="BuildIndex" viewTemplate="ViewOnlyTemplate"><pre>&lt;script&gt;
+if (forms.BuildIndex === undefined) {
+    forms.BuildIndex = http.buildIndex();
+    var status = &quot;Starting index build, &quot; + forms.BuildIndex.total + &quot; tiddlers in total&quot;;
+}
+else if (parseInt(forms.BuildIndex.done) &lt; parseInt(forms.BuildIndex.total)) {
+    forms.BuildIndex = http.buildIndex(forms.BuildIndex);
+    var sDone = forms.BuildIndex.done ? &quot;Done: &quot; + forms.BuildIndex.done + '&lt;br&gt;': &quot;&quot;;
+    var status = sDone + 'Total: ' + forms.BuildIndex.total;
+}
+else
+    return &quot;Index build completed: &quot; + forms.BuildIndex.done + " of " + forms.BuildIndex.total;
+
+setTimeout(function() {
+    story.refreshTiddler(&quot;BuildIndex&quot;, null, true);
+    },1000);
+
+return status;
+&lt;/script&gt;
+</pre></tiddler></tiddlers>

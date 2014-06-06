@@ -1,0 +1,24 @@
+<?xml version="1.0" ?><tiddlers><tiddler tags="excludeLists excludeSearch" title="AdvancedSearch" viewtemplate="ViewOnlyTemplate"><pre>&lt;script&gt;
+var pn = location.pathname;
+if (!pn.endsWith('/')) {
+	var pns = pn.split('/');
+  pns.pop();
+  pn = pns.join('/');
+}
+window.forms.AdvancedSearch = { updateaccess: true, path: pn };
+var b = http.listIndex();
+if (b.tiddlers === undefined)
+  return "No text index found - you may need to visit BuildIndex.";
+var sb = [];
+for (var n = 0; n &lt; b.tiddlers.length; n++) {
+  sb.push('|' + b.tiddlers[n] + '|&lt;&lt;input ' + b.tiddlers[n] + ' text 50&gt;&gt;|');
+}
+var lsbtn = '| |';
+if (location.pathname.indexOf('/',1) > 0) {
+  lsbtn = '|&lt;&lt;input path text 33&gt;&gt; &lt;&lt;submitButton true &quot;Search area&quot; &quot;Search entire site&quot; config.macros.search.searchSite(window.forms.AdvancedSearch,0,true)&gt;&gt;|';
+  //window.forms.AdvancedSearch.path = location.pathname;
+}
+sb.push('|&lt;&lt;submitButton true &quot;Search site&quot; &quot;Search entire site&quot; config.macros.search.searchSite(window.forms.AdvancedSearch,0,false)&gt;&gt;' + lsbtn);
+return sb.join('\n');
+&lt;/script&gt;
+</pre></tiddler></tiddlers>

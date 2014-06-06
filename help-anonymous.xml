@@ -1,0 +1,19 @@
+<?xml version="1.0" ?><document><storeArea><div modified="20100731100819" modifier="giewiki" tags="help" title="Welcome" vercnt="1" version="1"><pre>Before you can start editing your new giewiki, you need to &lt;&lt;login LoginOnly&gt;&gt; as administrator and set various data for the root page (making you the owner of it). This is done via the ''page properties'' dialog which looks a lot like this:&lt;br&gt;
+&lt;&lt;tiddler PageProperties&gt;&gt;
+The data is:
+* ''Title &amp; Subtitle''&lt;br&gt;What is displayed at the top of the page and in the SiteMap, etc.
+* ''Owner''&lt;br&gt;Who controls the properties of this page. This would be your PenName, which initially is the same as your login name, but you can change it via the UserProfile.
+* ''Groups''&lt;br&gt;You may define a group (or multiple groups) of people that should have elevated access to the page.
+* ''Access permissions''&lt;br&gt;The level of access that various user classes should have to this page.
+* ''Template''&lt;br&gt;Lets you select a template (other than ''normal'') for how the page should look and behave.
+* ''Tiddler libraries''&lt;br&gt;Library resources that you may include into the page.
+* ''External scripts'':&lt;br&gt;For advanced applications.
+* ''Tags''::&lt;br&gt;Optional. When given, these will show up in the SiteMap (except ''hidden'' which will prevent a page from being included in the SiteMap).
+* ''Read-only options''&lt;br&gt;Various aspects of how the page looks to someone who does not have edit access:
+** ''Prior versions''&lt;br&gt;Allows the reader access to prior versions of a tiddler, if they are preserved.
+** ''"view" button''&lt;br&gt;Allows the reader to see the "raw" text of a tiddler, including it's markup.
+* ''Fold-out index''&lt;br&gt;Controls whether the index lists located at the bottom of the right sidebar should be presented as a fold-out element (which makes large pages render more quickly).
+
+	The page properties dialog is normally accessed via the edit menu, but for a page with no data, it opens automatically.&lt;br&gt;
+The login dialog is usually accessed via the button at the top of the toolset on the right.
+</pre></div></storeArea><shadowArea/></document>

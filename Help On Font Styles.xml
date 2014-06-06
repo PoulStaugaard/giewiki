@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<tiddlers>
+<tiddler tags="help" title="Help On Font Styles" modified="20101201100819" modifier="giewiki" version="0"><pre>|Style|Formatting|h
+|''bold''|{{{''bold''}}} - two single-quotes, not a double-quote|
+|//italics//|{{{//italics//}}}|
+|''//bold italics//''|{{{''//bold italics//''}}}|
+|__underline__|{{{__underline__}}}|
+|--strikethrough--|{{{--Strikethrough--}}}|
+|super^^script^^|{{{super^^script^^}}}|
+|sub~~script~~|{{{sub~~script~~}}}|
+|@@Highlight@@|{{{@@Highlight@@}}}|
+|{{{plain text}}}|{{{ {{{PlainText No ''Formatting''}}} }}}|
+|/%this text will be invisible%/hidden text|{{{/%this text will be invisible%/}}}|
+</pre>
+</tiddler>
+</tiddlers>

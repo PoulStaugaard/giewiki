@@ -1,0 +1,69 @@
+<?xml version="1.0" ?>
+<tiddler tags="help" title="Help On Markup" modified="20101201100819" modifier="giewiki" version="0"><pre>!Headings
+{{{
+!Heading Level 1
+!!Heading Level 2
+!!!Heading Level 3
+!!!!Heading Level 4
+!!!!!Heading Level 5
+!!!!!!Heading Level 6
+}}}
+Display as:
+!Heading Level 1
+!!Heading Level 2
+!!!Heading Level 3
+!!!!Heading Level 4
+!!!!!Heading Level 5
+!!!!!!Heading Level 6
+!Horizontal rule
+Four dashes on a line by themselves are used to introduce a horizontal rule:
+{{{
+Before the rule
+----
+After the rule
+}}}
+Displays as:
+
+Before the rule
+----
+After the rule
+
+The HTML tag {{{&lt;hr&gt;}}} can be used as an alternative syntax:
+{{{
+Before the rule&lt;hr&gt;After the rule
+}}}
+Displays as:
+
+Before the rule&lt;hr&gt;After the rule
+!HTML Formatting
+Raw HTML text can be included in a tiddler:
+{{{
+&lt;html&gt;
+This is some &lt;strong&gt;HTML&lt;/strong&gt; formatting
+&lt;/html&gt;
+}}}
+&lt;html&gt;
+This is some &lt;strong&gt;HTML&lt;/strong&gt; formatting
+&lt;/html&gt;
+!!!NB:
+* only static HTML elements that are valid within a {{{&lt;div&gt;}}} work correctly
+* {{{document.write}}} cannot be used to generate dynamic content
+* External {{{&lt;script&gt;}}} elements cannot be used within {{{&lt;html&gt;}}} blocks
+!Line breaks
+Line breaks can be forced explicitly:
+{{{
+Some text with a&lt;br&gt;line break in the middle
+}}}
+Displays as:
+Some text with a&lt;br&gt;line break in the middle
+!Code Formatting
+Text such as computer code that should be displayed without wiki processing and preserving line breaks:
+&amp;#123;&amp;#123;&amp;#123;
+Some plain text including WikiLinks
+&amp;#125;&amp;#125;&amp;#125;
+Displays as:
+{{{
+Some plain text including WikiLinks
+}}}
+</pre>
+</tiddler>

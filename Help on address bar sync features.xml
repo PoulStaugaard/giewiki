@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tiddlers>
+	<tiddler tags="help" title="Help on address bar sync features" modifier="giewiki" version="0">
+		<pre>There are two ways to sync the browser address bar with the the content displayed in the middle (aka. //"Story"//) column:
+|!Automatic|!On demand|
+|When the checkbox labeled permaview (//in the right sidebar options panel//) is checked, the address bar will be updated whenever the contents of story column changes. This mimics a behaviour that you may be familiar with on other sites and allows you to hit 'refresh' ''at any time'' to get potentially new versions of the content you are seeing.|Experienced users may prefer to disable the automatic updates of the address bar, in which case they can still have it happen by clicking ''permaview'' (//in the right sidebar options panel//).|
+Background: The term ''permaview'' originates from [[TiddlyWiki|http://tiddlywiki.com]], meaning a permanent representation of the specific content you have in view, one that you can copy from the address bar for later reference.
+		</pre>
+	</tiddler>
+</tiddlers>

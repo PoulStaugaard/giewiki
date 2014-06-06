@@ -1,0 +1,152 @@
+<?xml version="1.0" ?>
+<tiddlers>
+<tiddler tags="help" title="Help On Macros" modified="20101201100819" modifier="giewiki" version="0"><pre>
+Macros let you insert special content. In general, they are applied using the syntax
+{{{
+	&lt;&lt;macroName parameters&gt;&gt;
+}}}
+where the relevant parameters are defined by each macro. Multiple parameters are separated by spaces. If a parameter value includes spaces, &quot;enclose it in quotes&quot;.
+In addition to the macros defined by TiddlyWiki, giewiki adds a set of it's own, for various purposes.
+This list of macros may not be complete, as plug-ins (like giewiki's youtube plugin) tend to define macros of their own.
+!!!General purpose macros
+|!macro name|!purpose|
+|[[tiddler|Help on tiddler macro]]|Renders the text of a specified tiddler at the point where is is applied|
+|[[gradient|Help on gradient macro]]|Renders text on a background of a gradient range of colors|
+|[[slider|Help on slider macro]]|Produces a panel that slides open/closed when clicked|
+|tabs|Create as set of tabs (such as the SideBarTabs)|
+|[[image|Help on image macro]]|Lets you add an image left or right, filling a specified percentage of the story column width|
+!!!Special purpose macros
+|!macro name|!purpose|
+|today|Formats and renders today's date using an optional format string parameters|
+|version|Shows the version of TiddlyWiki being used|
+|giewikiversion|Shows the version of giewiki that you are using|
+|search|Displays a search box|
+|tag|Creates a button that lists all the tiddlers with a specific tag|
+|tags|Part of the tagging facility|
+|tagging|Part of the tagging facility|
+|timeline|Defines the button in the edit menu|
+|allTags|Produces the list of tagged tiddlers in the index area on the right|
+|list|Produces the top-level wrapper of of the index lists|
+|closeAll|Makes a button for closing all tiddlers in the story column|
+|permaview|Produces a button for representing the currently displayed tiddlers into the browser address bar|
+|comments|Produces a toolbar for comment access and creation relative to the tiddler that contains it|
+|option|Part of the options panel implementation|
+|options|Part of the advanced options dialog implementation|
+|newTiddler|Produces a button to allow creatin a new tiddler|
+|newJournal|Similar to newTiddler, but inserting today's date for the title|
+|message|Renders text retrieved from a named global variable|
+|view|Renders a named field of the containing tiddler (used as part of the ViewTemplate)|
+|edit|Creates an input box initialized with the contents of as specific tiddler (used as part of the EditTemplate)|
+|tagChooser|Lets you pick existing tags to apply to a tiddler (used as part of the EditTemplate)|
+|toolbar|Builds a row of command buttons such as the one above each tiddler|
+
+!!!giewiki specific macros
+|!macro name|!purpose|
+|importTiddlers|The importTiddlers macro lets you easily import from ~TiddlyWiki or giewiki documents on the web or on this web site. Usage:&lt;br&gt;    {{{&lt;&lt;importTiddlers URL&gt;&gt;}}}&lt;br&gt;substituting URL with the web address or filename of the library you want to use.|
+
+</pre>
+</tiddler>
+<tiddler tags="help" title="Help on image macro" modified="20110613100819" modifier="giewiki" version="0"><pre>The image macro allows inserting images left or right of the surrounding text, or filling the width of the column. The syntax to put an image on the right is
+{{{&lt;&lt;image filename &gt; XX%&gt;&gt;}}}
+whereas, to put an image on the left, you would write
+{{{&lt;&lt;image filename &lt; XX%&gt;&gt;}}}
+Either way, insert the image macro before the text that you want to appear next to it, specify a percentage in place of //XX//, and in place of //filename//, put the name of a file you have previously uploaded. Beware that there is currently a filesize limit somewhat less than 1 MB on what you can upload to giewiki through the 'upload file' facility. The suggested workarounds are:
+* To include large images, put them in the ''static'' subfolder (or a subfolder thereof) of your local giewiki folder prior to deploying the files to appspot.com - then, refer to them using the full path, e.g. /static/images/myimage.jpg
+* Reduce the image size prior to uploading, using whatever software you may have for this purpose. One way is to use dropbox ( a free software/cloud service, that automatically puts your images out on the web and produces suitably reduced filesize versions that you can download).
+To make the image fill the entire width of the story column, you need to include only the filename parameter. 
+In stead of just one filename, you may specify two, separated by a | character. The second filename (or URL) will be opened when the image is clicked.
+Beware that the image macro is specific to giewiki; if you download the page as a TiddlyWiki, you will see an error message where the image macro is applied. If you were to use the [[TiddlyWiki-style|TiddlyWiki-style image markup]] {{{[img[filename]]}}} markup in stead (which is also supported), you would see either a broken link or the actual image, provided that you put it in the right place.
+</pre>
+</tiddler>
+<tiddler tags="help" title="Help on gradient macro" modified="20101201100819" modifier="giewiki" version="0"><pre>The Gradient macro allows simple horizontal and vertical coloured gradient backgrounds. They are constructed from coloured HTML elements, and don't require any images to work.
+The Gradient macro is an extended macro that processes the text after it up until the next '&gt;&gt;' sequence. For example,
+{{{&lt;&lt;gradient vert #4400ff #44ff44 #ff0044&gt;&gt;gradient fill&gt;&gt;}}}
+produces this:
+&lt;&lt;gradient vert #4400ff #44ff44 #ff0044&gt;&gt;gradient fill&gt;&gt;
+The first parameter can be ''vert'' or ''horiz'' to indicate the direction of the gradient. The following parameters are two or more colours (CSS RGB(r,g,b) format is also acceptable). The macro constructs a smooth linear gradient between each of the colours in turn.
+
+Inline CSS definitions can be added to gradient fills like so:
+{{{&lt;&lt;gradient horiz #000000 #660000 #aa2222&gt;&gt;color:#ffffff;font-size:14pt;text-align: center;Shadows And Light&lt;br&gt;Joni Mitchell, Jaco Pastorius, Don Alias, Pat Metheny, Michael Brecker (1979) 
+&gt;&gt;}}}
+which produces:
+&lt;&lt;gradient horiz #000000 #660000 #aa2222&gt;&gt;color:#ffffff;font-size:14pt;text-align: center;Shadows And Light&lt;br&gt;Joni Mitchell, Jaco Pastorius, Don Alias, Pat Metheny, Michael Brecker (1979) 
+&gt;&gt;
+</pre>
+</tiddler>
+<tiddler tags="help" title="Help on tiddler macro" modified="20101201100819" modifier="giewiki" version="0"><pre>The tidder macro will insert the contents of another tiddler into the current tiddler; so typing &quot;&lt;&lt;tiddler TiddlerTitle&gt;&gt;&quot; will insert the contents of TiddlerTitle, into the current Tiddler.  This is called [[transclusion]].  It is also sometimes called a &quot;template&quot; (not to be confused with TiddlyWiki's [[HTML Templates]] for page layout), especially if used with variables.
+!!!Example
+You have a tiddler called TiddlerOne, with the contents:
+ {{{This is Tiddler One!}}}
+
+You create a second tiddler with the contents:
+{{{This is Tiddler Two!  Here's what it says on Tiddler One:  &quot;&lt;&lt;tiddler TiddlerOne&gt;&gt;&quot;}}}
+
+When you're done editing, this new tiddler will read:
+
+This is Tiddler Two!  Here's what it says on Tiddler One:  &quot;&lt;&lt;tiddler TiddlerOne&gt;&gt;&quot;
+!!!Example with variable
+You can also add custom content to a transcluded tiddler with one or more variables (called $1, $2, $3, etc.).
+
+In this example, TiddlerThree has the contents:
+ Hello!  My name is $1.
+You create a second tiddler, adding &quot;with:&quot;, followed by the value of the variable.  (If there's more than one variable, each value is separated by a space; values with spaces should be enclosed in quotes or double square brackets):
+ {{{&lt;&lt;tiddler TiddlerThree with:&quot;Poul Staugaard&quot;&gt;&gt;}}}
+
+When you're done editing, this new tiddler will read (//edit this tiddler to check that this is indeed what is happening here//):
+ &lt;&lt;tiddler TiddlerThree with:&quot;Poul Staugaard&quot;&gt;&gt;
+</pre></tiddler>
+<tiddler tags="help" title="TiddlerThree" modified="20101201100819" modifier="giewiki" version="0"><pre> Hello!  My name is $1.</pre></tiddler>
+<tiddler tags="help" title="Help on slider macro" modified="20101201100819" modifier="giewiki" version="0"><pre>The slider macro allows embedding tiddlers within another tiddler, with the option to toggle the visibility of the [[transclusion|transcluded]] content:
+{{{
+&lt;&lt;slider cookie tiddler label tooltip&gt;&gt;
+}}}
+* {{{cookie}}}: variable to save the state of the slider (e.g. {{{chkFooSlider}}})
+* {{{tiddler}}}: name of the tiddler to include in the slider
+* {{{label}}}: title text of the slider
+* {{{tooltip}}}: tooltip text of the slider
+
+For example: 
+{{{
+&lt;&lt;slider chkTestSlider [[OptionsPanel]] &quot;Options&quot; &quot;Options panel&quot;&gt;&gt;
+}}}
+which produces this:
+
+&lt;&lt;slider chkTestSlider [[OptionsPanel]] &quot;Options&quot; &quot;Options panel&quot;&gt;&gt;
+</pre></tiddler>
+<tiddler tags="help" title="TiddlyWiki-style image markup" modified="20101201100819" modifier="giewiki" version="0"><pre>!Simple Images
+{{{
+[img[http://wikitext.tiddlyspace.com/fractalveg.jpg]]
+}}}
+Displays as:
+[img[http://wikitext.tiddlyspace.com/fractalveg.jpg]]
+!Tooltips for Images
+{{{
+[img[tooltip|http://wikitext.tiddlyspace.com/fractalveg.jpg]]
+}}}
+Displays as:
+[img[tooltip|http://wikitext.tiddlyspace.com/fractalveg.jpg]]
+!Image Links
+{{{
+[img[http://wikitext.tiddlyspace.com/fractalveg.jpg][http://www.flickr.com/photos/jermy/10134618/]]
+}}}
+Displays as:
+[img[http://wikitext.tiddlyspace.com/fractalveg.jpg][http://www.flickr.com/photos/jermy/10134618/]]
+!Floating Images with Text
+{{{
+[&lt;img[http://wikitext.tiddlyspace.com/fractalveg.jpg]]
+}}}
+[&lt;img[http://wikitext.tiddlyspace.com/fractalveg.jpg]]Displays as.
+{{{
+@@clear:both;display:block; @@
+}}}
+Will then clear the float.
+@@clear:both;display:block;Like this@@
+{{{
+[&gt;img[http://wikitext.tiddlyspace.com/fractalveg.jpg]]
+}}}
+[&gt;img[http://wikitext.tiddlyspace.com/fractalveg.jpg]]Displays as.@@clear:both;display:block; @@
+!See Also
+[[Help on image macro]]
+</pre>
+</tiddler>
+</tiddlers>
