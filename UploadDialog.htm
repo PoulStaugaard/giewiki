@@ -1,0 +1,172 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!--
+	File:	UploadDialog.htm
+	ver.:	1.17.3
+-->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<title>UploadDialog</title>
+<script type="text/javascript">
+function init()
+{
+	if (window.location.search.indexOf('?replace=') == 0)
+	{
+		var bImg = false;
+		var fn = decodeURIComponent(window.location.search.substr(9));
+		var fid = document.getElementById("filename");
+		fid.value = fn;
+		document.upldlg.method.value = 'replaceFile';
+	}
+	else
+		var bImg = window.location.search.length > 1;
+	if (bImg == false)
+		setStylesheet("*.imgctl { visibility: hidden }");
+
+	var rpid = document.getElementById("request_path");
+	var hash = window.location.hash && window.location.hash.substr(1);
+	if (hash)
+	    rpid.setAttribute("value", hash);
+
+	var pw = window.parent;
+	var pd = pw.document;
+	var dud = pd.getElementById("displayUploads");
+	var upldfndiv = document.getElementById("uploadedFilename");
+	var upldftype = document.getElementById("uploadedFiletype");
+	if (upldfndiv && upldftype)
+	{
+		var ftype = upldftype.firstChild.nodeValue;
+		var fname = upldfndiv.firstChild.nodeValue;
+		if (ftype != ('U'+'FT') && fname != ('U'+'FL')) { // cloaked to avoid substitution in UploadHandler.py
+			var fnsp = fname.lastIndexOf(".");
+			var fnxt = fnsp > 0 ? fname.substr(0, fnsp) : fname;
+			var text = (ftype == "image/jpeg" || ftype =="image/pjpeg") ? "<<image '" + fname + "' < 50%>>" : "[[" + fname + "|" + fname + "]]";
+			var action = 'InsertTiddlerText("'.concat(fnxt, '","', text, '","', document.getElementById("uploadedFileMessage").innerHTML, '")');
+			pw.setTimeout(action, 1);
+			if (dud) {
+				// and/or just list the tiddler:
+				pw.createTiddlyLink(dud, fnxt, true);
+				dud.appendChild(pd.createElement("br"));
+			}
+		}
+	}
+	var dur = pd.getElementById("displayUploadResult");
+	if (dur)
+	{
+		while(dur.hasChildNodes())
+			dur.removeChild(dur.firstChild);
+
+		var mur = document.getElementById("displayUploadResult");
+		if (mur.innerHTML == 'U' + 'LR') // avoid substitution in uploadFile(self)
+			mur.parentNode.removeChild(mur);
+		else
+			moveElements(mur,dur,pd);
+	}
+}
+function setStylesheet(s,id)
+{
+	if(!id)
+		id = "customStyleSheet";
+	var n = document.getElementById(id);
+	if(document.createStyleSheet) // Test for IE's non-standard createStyleSheet method
+		{
+		if(n)
+			n.parentNode.removeChild(n);
+		// This failed without the &nbsp;
+		document.getElementsByTagName("head")[0].insertAdjacentHTML("beforeEnd","&nbsp;<style id='" + id + "'>" + s + "</style>");
+		}
+	else
+		{
+		if(n)
+			n.replaceChild(document.createTextNode(s),n.firstChild);
+		else
+			{
+			var n = document.createElement("style");
+			n.type = "text/css";
+			n.id = id;
+			n.appendChild(document.createTextNode(s));
+			document.getElementsByTagName("head")[0].appendChild(n);
+			}
+		}
+}
+
+function moveElements(se,de,dd)
+{
+	while (se.hasChildNodes())
+	{
+		var sc = se.firstChild;
+		var c, i;
+		if (se.firstChild.nodeType == 1)
+		{
+			c = dd.createElement(sc.tagName);
+			for (i = 0; i < sc.attributes.length; i++)
+			{
+				var sca = sc.attributes.item(i);
+				c.setAttribute(sc.attributes.item(i).nodeName,sc.attributes.item(i).nodeValue);
+			}
+			if (sc.hasChildNodes())
+				moveElements(sc,c,dd);
+			c.nodeValue = sc.nodeValue;
+		}
+		else
+			c = dd.createTextNode(sc.nodeValue);
+
+		de.appendChild(c);
+		se.removeChild(sc);
+	}
+}
+
+function valid() 
+{
+	var srcfn = document.upldlg.MyFile.value;
+	if (srcfn == "") {
+		alert("Please select the file to upload");
+		return false;
+	}
+	else if (document.upldlg.filename.value == "") {
+		fnp = srcfn.split('\\');
+		if (fnp.length == 1)
+			fnp = srcfn.split('/');
+		document.upldlg.filename.value = fnp[fnp.length - 1];
+	}
+	return true;
+}
+
+function fileSelected()
+{
+	var fid = document.getElementById("filename");
+	var sel = document.getElementById("existing");
+	var v = sel.value;
+	fid.value = v;
+}
+
+	</script>
+</head>
+<body onload="init();" style="font-family: arial,helvetica; font-size: .75em; background-color: transparent;">
+	<div id="displayUploadResult" visible="false">ULR</div>
+	<form action="<uploadHandler>" id="upldlg" name="upldlg" method="post" enctype="multipart/form-data" onsubmit="return valid()">
+		<table border=0>
+		<td colspan=3>
+		Select file to upload:<br />
+		<input name="MyFile" type="File" id="MyFile" size="70" onchange="valid()"/><br />
+		</td>
+		<tr>
+		<td>
+		Name the uploaded file: <br />
+		<input name="filename" type="text" id="filename" />
+		</td>
+		<!--td>or replace an<br><a href='javascript:;' id='listExisting'>Existing file</a-->		
+		<td ><span class="imgctl">Align<br /><select name="align"><option>center</option><option>left</option><option>right</option></select></span></td>
+		<td ><span class="imgctl">Width<br /><select name="width"><option>100%</option><option>67%</option><option>50%</option><option>33%</option></select></span><br /></td>
+		</tr>
+		</table>
+		<input name="SubmitNewFile" type="Submit" id="Submit1" value="Upload file" />
+		<!--&nbsp; Existing files:<select name="existing" id="SubmitNewFile" onchange="fileSelected()"><option></option>{1}</select>
+		<input name="SubmitNewVersion" type="Submit" id="SubmitNewVersion" value="Replace existing file" /> -->
+		<input name="path" type="hidden" id="request_path" value="<requestPath>" />
+	</form>
+	<div id="uploadedFilename" style="display: none">UFL</div>
+	<div id="uploadedFiletype" style="display: none">UFT</div>
+	<div id="uploadedFileMessage" style="display: none">UFM</div>
+</body>
+</html>

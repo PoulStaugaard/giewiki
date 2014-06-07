@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" ?><div modified="20100405095004" modifier="poul.staugaard" tags="systemConfig" title="PublishPlugin" version="0"><pre>
+/***
+|''Name:''|PublishPlugin|
+|''Version:''|1.0.0 (2010-04-18)|
+|''Source:''|http://code.google.com/p/giewiki|
+|''Author:''|Poul Staugaard (poul [dot] staugaard [at] gmail [dot] com)|
+|''Licence:''|[[BSD open source license]]|
+***/
+//{{{
+http._addMethod('publishSub');
+se = store.getTiddler('EditingMenu');
+se.text = se.text + '\nmacro|publishPlugin|!tiddler.hasShadow' + '\n';
+config.macros.publishPlugin = {
+  handler: function(place,macroName,params,wkfr,paramString) {
+    host = location.host.split('.').slice(1)
+    createTiddlyButton(place, "publish", "publish to " + host, this.onclick, null, null, null, {'filter': paramString });
+  },
+  onclick: function(ev) {
+    var e = ev || window.event;
+    var me = resolveTarget(e);
+    var params = me.getAttribute('filter');
+    if (params &amp;&amp; params.length) {
+      store.filtered = [];
+      var code = ['if (', params, ') this.filtered.push(encodeURIComponent(title));'].join('');
+      var ff = new Function("title","tiddler", code);
+      store.forEachTiddler(ff);
+      //displayMesssage(store.filtered.join('&amp;'));
+    }
+    http.publishSub({'s': store.filtered});
+  }
+};
+//}}}
+</pre>
+</div>

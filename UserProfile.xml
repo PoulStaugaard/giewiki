@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<tiddlers>
+<tiddler title="UserProfile" viewTemplate="ViewOnlyTemplate">
+<pre>&lt;script&gt;forms.UserProfile = http.userProfile();
+window.AddNewProject = function() {
+  var n = 'newproject'; 
+  if (config.macros.input.showField(n)) { 
+    if (ConfirmIfMessage(http.addProject({'domain': forms.UserProfile.newproject})))
+      if (http.addProject({'domain': forms.UserProfile.newproject, 'confirmed': true}).success) 
+        story.refreshTiddler(&quot;UserProfile&quot;,null,true);
+  } 
+  else {
+    if (config.serverType.startsWith('Development'))
+      displayMessage("NB: With a local server, name resolution is likely to fail without specific configuration");
+    config.macros.input.showField(n,true);
+  }
+}
+&lt;/script&gt;
+|My pen name&lt;br&gt;&lt;&lt;input txtUserName text 50&gt;&gt;|
+|About me (displayed as a tooltip)&lt;br&gt;&lt;&lt;input aboutme textarea 5*50&gt;&gt;|
+|Email address for receiving messages&lt;br&gt;&lt;&lt;input txtEmail text 50&gt;&gt;|
+|Template for sending tiddler-related messages&lt;br&gt;Subject: &lt;&lt;input tmsg_subject text 40&gt;&gt;&lt;br&gt;Body:&lt;br&gt; &lt;&lt;input tmsg_body textarea 3*40&gt;&gt;|
+|When my pen name is clicked, display this page or tiddler (/path#title)&lt;br&gt;&lt;&lt;input tiddler text 55&gt;&gt; &lt;script label=&quot;Display&quot; title=&quot;Display tiddler now&quot;&gt;DisplayNonLocalTiddler(null,forms.UserProfile.tiddler);&lt;/script&gt;|
+|My projects&lt;br&gt; &lt;&lt;myprojects&gt;&gt;&lt;&lt;input newproject text 55&gt;&gt; &lt;script if=&quot;config.project == ''&quot; label=&quot;Add&quot; title=&quot;Add project&quot;&gt;AddNewProject()&lt;/script&gt;&lt;br&gt;|
+|&lt;script label=&quot;My notes&quot; title=&quot;My notes&quot;&gt;ListMyNotes(http.getNotes());&lt;/script&gt;&lt;html&gt;  &lt;div id='myNotesArea' /&gt;  &lt;/html&gt;|
+|&lt;script label=&quot;Save&quot; title=&quot;Save&quot;&gt;OnCommitCloseForm(&quot;UserProfile&quot;,http.userProfile(forms.UserProfile));&lt;/script&gt;|
+&lt;script&gt;config.macros.input.showField('newproject',false);&lt;/script&gt;
+</pre>
+</tiddler>
+</tiddlers>

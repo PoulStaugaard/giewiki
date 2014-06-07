@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<tiddlers>
+  <tiddler title="SearchHistoryScript" tags="systemConfig excludeLists excludeSearch">
+    <pre>
+//{{{
+window.searchHistory = function (offs) {
+    var h = http.searchHistory({ offs: offs, limit: 10 });
+    var we = document.getElementById('tiddlerSearchHistory');
+    var cnl = getElementsByClassName('viewer', 'div', we);
+    if (h.whats.length == 0)
+        return wikify("No search history found.",cnl);
+    var his = h.history.split('||');
+    var hif = [];
+    var j = 0;
+
+    for (var i = 0; i &lt; his.length; i++) {
+        hif.push(his[i]);
+        if (i &lt; h.whats.length) {
+            hif.push('|&lt;script label="');
+            hif.push(h.whats[i]);
+            hif.push('"&gt;config.macros.search.searchSite("' + h.whats[i] + '",0,"' + h.wheres[i] + '")&lt;/script&gt;|');
+        }
+    }
+    wikify(hif.join(''), cnl);
+    if (h.ended) {
+        createTiddlyButton(cnl, '&lt;&lt;', "Earlier searches",
+            function (ev) {
+                var ce = clearParent(resolveTarget(ev || window.event), 'div');
+                window.searchHistory(offs + 10);
+            });
+        }
+    if (offs &gt;= 10) {
+        createTiddlyButton(cnl, '&gt;&gt;', 'Later searches',
+            function (ev) {
+                var ce = clearParent(resolveTarget(ev || window.event), 'div');
+                window.searchHistory(offs - 10);
+            });
+        }
+    }
+//}}}
+    </pre>
+  </tiddler>
+  <tiddler title="SearchHistory" viewtemplate="ViewOnlyTemplate" tags="excludeLists">
+    <pre>/% Content built by SearchHistoryScript %/ &lt;script&gt; window.searchHistory(0); &lt;/script&gt; </pre>
+  </tiddler>
+</tiddlers>

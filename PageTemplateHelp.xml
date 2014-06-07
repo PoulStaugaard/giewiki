@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<tiddler viewTemplate="ViewOnlyTemplate" modified="20101201100819" modifier="giewiki" tags="help" title="PageTemplateHelp" vercnt="1" version="0">
+	<pre>Page templates are a way to compile sets of reusable tiddlers (typically plugins or modifications to the default set of special tiddlers) in such a way that they are more easily included in other pages. If they consist of a significant number of tiddlers, you will also see a reduction in the page load time compared with pages that include the same set explicitly from a library page. 
+
+Page templates also include the Predefined tiddler tags of the source page. Pages that use the template will inherit these unless they define their own.
+* Templates are //created// from pages by adding the tag template (just click //template//). You will typically create the page specifically to be used for creating a template. The content of the page may consist entirely of [[Library includes|LibraryUsageHelp]]. Some basic templates such as MPTW exist that are created implicitly from the static library files of the installation.
+* Templates are //applied// by selecting from the list which is presented when you click Use ''template..''
+* Templates are //not// updated automatically when you edit the pages that have the template tag; click //template// again to update the template. You may not always want the updated template to be applied to pages that already use the previous template version of the template. If you do //not//, you should add the additional tag //version// - this causes the previous version to be preserved.
+Unless the 'include' tag is applied to the page defining a template, content from a template is kept more or less hidden by the addition of the attribute tags //excludeLists// and //excludeSearch//.
+The tag //fromTemplate// is applied to all content included from a template.
+	</pre>
+</tiddler>
+

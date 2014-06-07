@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<tiddlers>
+	<div title="ViewTemplateEditTemplate"> <!-- used for editing the ViewTemplate -->
+		<pre>
+			&lt;!--{{{--&gt;
+			&lt;div class='editor' macro='edit text'&gt;&lt;/div&gt;
+			History view:
+			&lt;div class='editor' macro='edit historyview'&gt;&lt;/div&gt;
+			Tags:
+			&lt;span class='tagFrame' &gt; &lt;div class='editor' macro='edit tags'&gt;&lt;/div&gt;&lt;/span&gt;
+			&lt;span class='commentToolbar' macro='toolbar [[ToolbarCommands::SpecialEditToolbar]]'&gt;&lt;/span&gt;
+			&lt;div class='history' &gt;&lt;/div&gt;
+			&lt;div class='viewer special' macro='view text wikified'&gt;&lt;/div&gt;
+			&lt;!--}}}--&gt;
+		</pre>
+	</div>
+</tiddlers>

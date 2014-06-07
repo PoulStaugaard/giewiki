@@ -1,0 +1,120 @@
+<?xml version="1.0" ?><div comments="0" modified="20100405095004" modifier="pou.staugaard" tags="systemConfig" title="PMM" version="1"><pre>//{{{
+// plugin macro; see iewiki.js for copyright info
+config.shadowTiddlers.PluginManager = "&lt;&lt;plugins&gt;&gt;";
+config.macros.plugins =
+{
+	wizardTitle: &quot;Manage plugins&quot;,
+	step1Title: &quot;Currently loaded plugins&quot;,
+	step1Html: &quot;&lt;input type='hidden' name='markList'&gt;&lt;/input&gt;&quot;, // DO NOT TRANSLATE
+	skippedText: &quot;(This plugin has not been executed because it was added since startup)&quot;,
+	noPluginText: &quot;There are no plugins installed&quot;,
+	confirmDeleteText: &quot;Are you sure you want to delete these plugins:\n\n%0&quot;,
+	removeLabel: &quot;remove systemConfig tag&quot;,
+	removePrompt: &quot;Remove systemConfig tag&quot;,
+	deleteLabel: &quot;delete&quot;,
+	deletePrompt: &quot;Delete these tiddlers forever&quot;,
+	listViewTemplate: {
+		columns: [
+			{name: 'Selected', field: 'Selected', rowName: 'title', type: 'Selector'},
+			{name: 'Tiddler', field: 'tiddler', title: &quot;Tiddler&quot;, type: 'Tiddler'},
+			{name: 'Description', field: 'Description', title: &quot;Description&quot;, type: 'String'},
+			{name: 'Version', field: 'Version', title: &quot;Version&quot;, type: 'String'},
+			{name: 'Size', field: 'size', tiddlerLink: 'size', title: &quot;Size&quot;, type: 'Size'},
+			{name: 'Forced', field: 'forced', title: &quot;Forced&quot;, tag: 'systemConfigForce', type: 'TagCheckbox'},
+			{name: 'Disabled', field: 'disabled', title: &quot;Disabled&quot;, tag: 'systemConfigDisable', type: 'TagCheckbox'},
+			{name: 'Executed', field: 'executed', title: &quot;Loaded&quot;, type: 'Boolean', trueText: &quot;Yes&quot;, falseText: &quot;No&quot;},
+			{name: 'Startup Time', field: 'startupTime', title: &quot;Startup Time&quot;, type: 'String'},
+			{name: 'Error', field: 'error', title: &quot;Status&quot;, type: 'Boolean', trueText: &quot;Error&quot;, falseText: &quot;OK&quot;},
+			{name: 'Log', field: 'log', title: &quot;Log&quot;, type: 'StringList'}
+			],
+		rowClasses: [
+			{className: 'error', field: 'error'},
+			{className: 'warning', field: 'warning'}
+			]},
+	handler: function(place,macroName,params,wikifier,paramString)
+	{
+		var wizard = new Wizard();
+		wizard.createWizard(place,this.wizardTitle);
+		wizard.addStep(this.step1Title,this.step1Html);
+		var markList = wizard.getElement(&quot;markList&quot;);
+		var listWrapper = document.createElement(&quot;div&quot;);
+		markList.parentNode.insertBefore(listWrapper,markList);
+		listWrapper.setAttribute(&quot;refresh&quot;,&quot;macro&quot;);
+		listWrapper.setAttribute(&quot;macroName&quot;,&quot;plugins&quot;);
+		listWrapper.setAttribute(&quot;params&quot;,paramString);
+		this.refresh(listWrapper,paramString);
+	},
+	refresh: function(listWrapper,params)
+	{
+		var wizard = new Wizard(listWrapper);
+		var selectedRows = [];
+		ListView.forEachSelector(listWrapper,function(e,rowName) {
+				if(e.checked)
+					selectedRows.push(e.getAttribute(&quot;rowName&quot;));
+			});
+		removeChildren(listWrapper);
+		params = params.parseParams(&quot;anon&quot;);
+		var plugins = [];
+		for (var atn in installedPlugins)
+			plugins.push(installedPlugins[atn]);
+		var t,tiddler,p;
+		var configTiddlers = store.getTaggedTiddlers(&quot;systemConfig&quot;);
+		for(t=0; t&lt;configTiddlers.length; t++) {
+			tiddler = configTiddlers[t];
+			if(plugins.findByField(&quot;title&quot;,tiddler.title) == null) {
+				p = getPluginInfo(tiddler);
+				p.executed = false;
+				p.log.splice(0,0,this.skippedText);
+				plugins.push(p);
+			}
+		}
+		for(t=0; t&lt;plugins.length; t++) {
+			p = plugins[t];
+			p.size = p.tiddler.text ? p.tiddler.text.length : 0;
+			p.forced = p.tiddler.isTagged(&quot;systemConfigForce&quot;);
+			p.disabled = p.tiddler.isTagged(&quot;systemConfigDisable&quot;);
+			p.Selected = selectedRows.indexOf(plugins[t].title) != -1;
+		}
+		if(plugins.length == 0) {
+			createTiddlyElement(listWrapper,&quot;em&quot;,null,null,this.noPluginText);
+			wizard.setButtons([]);
+		} else {
+			var listView = ListView.create(listWrapper,plugins,this.listViewTemplate,this.onSelectCommand);
+			wizard.setValue(&quot;listView&quot;,listView);
+			wizard.setButtons([
+					{caption: config.macros.plugins.removeLabel, tooltip: config.macros.plugins.removePrompt, onClick: config.macros.plugins.doRemoveTag},
+					{caption: config.macros.plugins.deleteLabel, tooltip: config.macros.plugins.deletePrompt, onClick: config.macros.plugins.doDelete}
+				]);
+		}
+	},
+	doRemoveTag: function(e)
+	{
+		var wizard = new Wizard(this);
+		var listView = wizard.getValue(&quot;listView&quot;);
+		var rowNames = ListView.getSelectedRows(listView);
+		if(rowNames.length == 0) {
+			alert(config.messages.nothingSelected);
+		} else {
+			for(var t=0; t&lt;rowNames.length; t++)
+				store.setTiddlerTag(rowNames[t],false,&quot;systemConfig&quot;);
+		}
+	},
+	doDelete: function(e)
+	{
+		var wizard = new Wizard(this);
+		var listView = wizard.getValue(&quot;listView&quot;);
+		var rowNames = ListView.getSelectedRows(listView);
+		if(rowNames.length == 0) {
+			alert(config.messages.nothingSelected);
+		} else {
+			if(confirm(config.macros.plugins.confirmDeleteText.format([rowNames.join(&quot;, &quot;)]))) {
+				for(var t=0; t&lt;rowNames.length; t++) {
+					store.removeTiddler(rowNames[t]);
+					story.closeTiddler(rowNames[t],true);
+				}
+			}
+		}	
+	}
+}
+//}}}
+</pre></div>

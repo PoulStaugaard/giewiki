@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" ?>
+<tiddlers>
+	<tiddler tags="excludeLists excludeSearch" title="PageSearchFAQ" viewtemplate="ViewOnlyTemplate">
+		<pre>* If a tiddler has the [[lazy-load attribute]] //and// it isn't currently loaded from the server, a page search will not find any text on it.
+* Key-by-key search works best for pages that do not have too much text (or very many tiddlers) that are loaded. If it's too slow, disable it and click Page to perform a page search.
+* Several solutions exist in the TiddlyWiki world that try to improve on the basic page search facility.
+* Regular expression search assumes that input is given in JavaScript regular expressions (see http://www.regular-expressions.info/reference.html).
+		</pre>
+	</tiddler>
+	<tiddler tags="" title="lazy-load attribute" viewtemplate="ViewOnlyTemplate">
+		<pre>The lazy-load attribute (which is actually stored as the tag lazyLoad) can be assigned to tiddlers that are very large and/or rarely needed on the page.
+		</pre>
+  </tiddler>
+</tiddlers>
+
