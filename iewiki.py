@@ -2312,6 +2312,7 @@ class MainPage(webapp.RequestHandler):
 	if rurl.find('/',0,-1) >= 0:
 		return self.fail("A / is allowed only to end the address")
 		
+	logging.info("createPage(" + url + ")")
 	page = Page.all().filter('path',url).get()
 	if page == None:
 		page = Page()
@@ -3545,18 +3546,19 @@ class MainPage(webapp.RequestHandler):
 	self.trace.append(msg)
 	
   def CurrentPage(self):
-	pp = memcache.get(self.path)
+	path = urllib.unquote(self.path)
+	pp = memcache.get(path)
 	if pp != None and type(pp) == Page:
-		logging.info("Page " + self.path + " found in memcache")
+		logging.info("Page " + path + " found in memcache")
 		return pp
-	for page in Page.all().filter("path",self.path):
-		logging.info("Page " + self.path + " found.")
+	for page in Page.all().filter("path",path):
+		logging.info("Page " + path + " found.")
 		return page
-	logging.info("CurrentPage: " + self.path + " NOT found")
+	logging.info("CurrentPage: " + path + " NOT found")
 	if self.subdomain != None and (not hasattr(self.sdo,"version") or self.sdo.version < giewikiVersion):
 		namespace_manager.set_namespace(None)
-		LogEvent('CurrentPage', "Upgrading page " + self.path + " of " + self.request.host)
-		page = Page.all().filter('sub',self.subdomain).filter("path",self.path).get()
+		LogEvent('CurrentPage', "Upgrading page " + path + " of " + self.request.host)
+		page = Page.all().filter('sub',self.subdomain).filter("path",path).get()
 		LogEvent('CurrentPage', "Page version " + (page.gwversion if page != None else "Page not found"))
 		namespace_manager.set_namespace(self.subdomain)
 		return page
@@ -3988,7 +3990,7 @@ class MainPage(webapp.RequestHandler):
 
   def get(self): # this is where it all starts
 	self.user = users.get_current_user()
-	self.path = self.request.path
+	self.path = urllib.unquote(self.request.path)
 	self.getSubdomain()
 	if self.path.endswith('.config.js'):
 		return self.getConfig()
