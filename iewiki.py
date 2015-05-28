@@ -1,7 +1,7 @@
 # this:  iewiki.py
 # by:    Poul Staugaard [poul(dot)staugaard(at)gmail...]
 # URL:   http://code.google.com/p/giewiki
-# ver.:  1.18.3
+# ver.:  1.18.6
 
 import cgi
 import codecs
@@ -19,6 +19,9 @@ import xml.dom.minidom
 
 from new import instance, classobj
 from os import path
+
+import sys
+reload(sys); sys.setdefaultencoding('utf-8')
 
 from google.appengine.api import users
 from google.appengine.ext import webapp
@@ -39,7 +42,7 @@ from giewikidb import truncateModel, truncateAllData, HasGroupAccess, ReadAccess
 
 from javascripts import javascriptDict
 
-giewikiVersion = '1.18.3'
+giewikiVersion = '1.18.6'
 TWComp = 'twcomp.html'
 
 _INDEX_NAME = 'tiddlers'
@@ -1377,7 +1380,7 @@ class MainPage(webapp.RequestHandler):
 		for amg in GroupMember.all().filter('name',cu.nickname()):
 			if amg.group:
 				ug = ug + " OR " + amg.group
-
+	
 	q = text + ("" if text == "" else " AND ") + "(uxl_:" + ug + ")"
 	if path != '/':
 		pap = path[0:path.rfind('/')+1]

@@ -1,5 +1,5 @@
 application: giewiki-hrd
-version: 1-18-4
+version: 1-18-6
 runtime: python27
 threadsafe: no
 api_version: 1
