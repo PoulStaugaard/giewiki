@@ -1725,7 +1725,7 @@ class MainPage(webapp.RequestHandler):
   def recycleBin(self):
 	get = self.request.get('get')
 	if get != '':
-		tlr = Tiddler.get(get)
+		tlr = db.get(get)
 		if tlr is None:
 			return self.fail("Key not found", get)
 		else:
@@ -1741,7 +1741,7 @@ class MainPage(webapp.RequestHandler):
 		return self.reply({ 'tiddlers': da })
 	rescue = self.request.get('rescue')
 	if rescue:
-		ctlr = Tiddler.get(rescue)
+		ctlr = db.get(rescue)
 		if ctlr is None:
 			return self.fail("Tiddler not found: " + ctlr)
 		if ctlr.current:
