@@ -2922,9 +2922,22 @@ class MainPage(webapp.RequestHandler):
 		
 	path = self.request.get('path')
 	far = []
-	for f in files.fetch(100):
-		if path == "" or f.path.find(path) == 0:
-			far.append( { 'date': f.date, 'mimetype': f.mimetype, 'owner': f.owner.nickname() if f.owner != None else '', 'path': f.path, 'size': -1 if f.blob == None else f.blob.size } ) 
+	for f in files.fetch(1000):
+		logging.info(f.path)
+		pos = f.path.find(path)
+		if path == "" or pos == 0:
+			logging.info("> " + f.path) 
+			date = f.date
+			mimetype = f.mimetype
+			owner = f.owner.nickname() if f.owner is not None else ""
+			pat = f.path
+			try:
+				size = f.blob.size
+			except:
+				size = -1
+			far.append( { 'date': date, 'mimetype': mimetype, 'owner': owner , 'path': pat, 'size': size } )
+		else:
+			logging.info("Hide " + f.path + " (found " + path + " at pos " + str(pos)) 
 	self.reply({ 'files': far })
 
   def deleteFile(self):
