@@ -1,7 +1,7 @@
 # this:  iewiki.py
 # by:    Poul Staugaard [poul(dot)staugaard(at)gmail...]
 # URL:   http://code.google.com/p/giewiki
-# ver.:  1.18.7
+# ver.:  1.18.9
 
 import cgi
 import codecs
@@ -42,7 +42,7 @@ from giewikidb import truncateModel, truncateAllData, HasGroupAccess, ReadAccess
 
 from javascripts import javascriptDict
 
-giewikiVersion = '1.18.7'
+giewikiVersion = '1.18.9'
 TWComp = 'twcomp.html'
 
 _INDEX_NAME = 'tiddlers'
@@ -112,7 +112,7 @@ getTemplates'
 
 jsProlog = '\
 // This file is auto-generated\n\
-var giewikiVersion = { title: "giewiki", major: 1, minor: 18, revision: 3, date: new Date("May 28, 2013"), extensions: {} };\n\
+var giewikiVersion = { title: "giewiki", major: 1, minor: 18, revision: 9, date: new Date("May 28, 2013"), extensions: {} };\n\
 http = {\n\
   _methods: [],\n\
   _addMethod: function(m) { this[m] = new Function("a","return HttpGet(a,\'" + m + "\')"); }\n\
