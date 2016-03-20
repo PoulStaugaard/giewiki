@@ -1,7 +1,7 @@
 # this:  iewiki.py
 # by:    Poul Staugaard [poul(dot)staugaard(at)gmail...]
 # URL:   http://code.google.com/p/giewiki
-# ver.:  1.18.6
+# ver.:  1.18.7
 
 import cgi
 import codecs
@@ -42,7 +42,7 @@ from giewikidb import truncateModel, truncateAllData, HasGroupAccess, ReadAccess
 
 from javascripts import javascriptDict
 
-giewikiVersion = '1.18.6'
+giewikiVersion = '1.18.7'
 TWComp = 'twcomp.html'
 
 _INDEX_NAME = 'tiddlers'
@@ -127,7 +127,7 @@ jsConfig ='\
 var config = {\n\
 	animDuration: 400,\n\
 	appId: "<appid>",\n\
-	autoSaveAfter: 20,\n\
+	autoSaveAfter: 15,\n\
 	cascadeFast: 20,\n\
 	cascadeSlow: 60,\n\
 	cascadeDepth: 5,\n\
