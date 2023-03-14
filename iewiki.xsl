@@ -518,7 +518,7 @@ macro|newJournal|"DD MMM YYYY" "journal"
 tiddler|CreateNewPage|new page|Create new page|p
 tiddler|UploadDialog|upload file|Upload a local file|u
 tiddler|PageSetup|page setup|Edit page properties and presentation|p
-tiddler|File list|file list|list of uploaded files|f
+tiddler|FileList|file list|list of uploaded files|f
 tiddler|Recycle bin|recycle bin|List of 'deleted' tiddlers|r
 </pre>
 </div>
@@ -549,6 +549,9 @@ See also the AdvancedOptions
 </div>
 <div title="SiteMap" viewTemplate="ViewOnlyTemplate">
 	<pre>&lt;&lt;siteMap&gt;&gt;</pre>
+</div>
+<div title="FileList" viewTemplate="ViewOnlyTemplate">
+	<pre>&lt;&lt;fileList&gt;&gt;</pre>
 </div>
 <div title="RecentChanges" viewTemplate="ViewOnlyTemplate">
   <pre>&lt;html&gt;&lt;div class='title'&gt;Recent changes&lt;/div&gt;&lt;/html&gt;

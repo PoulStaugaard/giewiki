@@ -299,6 +299,7 @@ a.tiddlyLinkNonExisting.shadow {font-weight:bold;}
 .siteSubtitle {font-size:1.2em;}
 
 #topRightCorner { position:absolute; top:0.5em;right:0.9em; font-size: 1.1em; text-align: right; }
+#bottomArea { position:fixed; bottom:0;left:0;width:100%;background-color:#333;color: #fff;padding:3px; }
 
 #leftSidebar {position:absolute; left:0; width:10em; padding:0.5em 0.5em 0.5em 0.5em;}
 #mainMenu {text-align:right; line-height:1.6em; font-size:1.1em;}
@@ -472,6 +473,7 @@ body {font-size:0.8em;}
 &lt;div id='displayArea'&gt;
 &lt;div id='messageArea'&gt;&lt;/div&gt;
 &lt;div id='tiddlerDisplay'&gt;&lt;/div&gt;
+&lt;div id='bottomArea' class='bottomArea' refresh='content' tiddler='BottomArea'&gt;&lt;/div&gt;
 &lt;/div&gt;
 &lt;!--}}}--&gt;
 </pre>
@@ -583,6 +585,8 @@ link|http://localhost:8000/datastore?kind=Page|DataStore|config.admin
 'DefaultTiddlers' 'Middle column initial content' 'js;editTiddlerHere;DefaultTiddlers'
 'ColorPalette' 'Color palette' 'js;editTiddlerHere;ColorPalette'
 'StyleSheet' 'Custom styles' 'js;editTiddlerHere;StyleSheet'
+'BottomArea' 'Optional content at window bottom' 'js;editTiddlerHere;BottomArea'
+'TopRightCorner' 'Optional content at TopRightCorner' 'js;editTiddlerHere;TopRightCorner'
 'All..' 'Other special tiddlers' 'js;editTiddlerHere;SpecialTiddlers;SpecialViewTemplate'
 &gt;&gt;
 !Common tweaks
@@ -598,20 +602,19 @@ macro|tiwinate|
 tiddler|CreateNewPage|new page|Create new page or folder|p
 tiddler|UploadDialog|upload file|Upload a local file|u
 tiddler|PageSetup|page setup|Edit page properties and presentation|p
-tiddler|File list|file list|list of uploaded files|f
-tiddler|Recycle bin|recycle bin|List of 'deleted' tiddlers|r
+tiddler|FileList|file list|list of uploaded files|f
+tiddler|RecycleBin|recycle bin|List of 'deleted' tiddlers|r
 macro|pasteTiddler|
 </pre>
 </div>
-<div title="File list" viewTemplate="SpecialViewTOTemplate">
-<pre>
-&lt;&lt;fileList&gt;&gt;
-</pre>
+<div title="FileList">
+	<pre>&lt;&lt;fileList&gt;&gt;</pre>
 </div>
-<div title="Recycle bin"  viewTemplate="SpecialViewTOTemplate">
-<pre>
-&lt;&lt;recycleBin *&gt;&gt;
-</pre>
+<div title="BottomArea" viewTemplate="SpecialViewTOTemplate">
+	<pre></pre>
+</div>
+<div title="RecycleBin"	>
+<pre>&lt;&lt;recycleBin *&gt;&gt;</pre>
 </div>
 <div title="OptionsPanel">
 <pre>

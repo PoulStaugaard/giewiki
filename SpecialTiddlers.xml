@@ -23,13 +23,14 @@ config.macros.STETabInsert = {
 &lt;/script&gt;''These are the pre-defined tiddlers used by giewiki, most of which have default content that serves a special purpose.''
 
 |&lt;&lt;STETabInsert AdvancedOptions&gt;&gt;|This shadow tiddler provides access to several advanced options.|
+|&lt;&lt;STETabInsert BottomArea&gt;&gt;|This shadow tiddler is rendered in a floating area at the bottom of the screen|
 |&lt;&lt;STETabInsert ColorPalette&gt;&gt;|These values in this shadow tiddler determine the colour scheme of the user interface|
 |&lt;&lt;STETabInsert CreateNewPage&gt;&gt;|Dialog for creating pages|
 |&lt;&lt;STETabInsert DefaultTiddlers&gt;&gt;|The tiddlers listed in this shadow tiddler will be automatically displayed when the page loads|
 |&lt;&lt;STETabInsert DefineGroup&gt;&gt;|Dialog for defining a user group|
 |&lt;&lt;STETabInsert EditTemplate&gt;&gt;|The HTML template in this shadow tiddler determines how tiddlers look while they are being edited|
 |&lt;&lt;STETabInsert EditingMenu&gt;&gt;|Menu which is inserted into the right sidebar when you have edit rights|
-|File list|Auto-generated list of uploaded files|
+|&lt;&lt;STETabInsert FileList&gt;&gt;|Auto-generated list of uploaded files|
 |&lt;&lt;STETabInsert LibraryUsageHelp&gt;&gt;|A help file|
 |&lt;&lt;STETabInsert MainMenu&gt;&gt;|This shadow tiddler is used as the contents of the main menu in the left-hand column of the screen|
 |&lt;&lt;STETabInsert MoveThisPage&gt;&gt;|Dialog for changing the address of the current page|
@@ -41,9 +42,9 @@ config.macros.STETabInsert = {
 |&lt;&lt;STETabInsert PageTemplate&gt;&gt;|The HTML template in this shadow tiddler determines the overall page layout.&lt;br&gt;//This is a separate concept from the [[Page template|PageTemplateHelp]] mechanism//|
 |&lt;&lt;STETabInsert PageTemplateHelp&gt;&gt;|A help file describing the Page templating mechanism|
 |&lt;&lt;STETabInsert PluginManager&gt;&gt;|This shadow tiddler provides access to the plugin manager|
-|RecentChanges|Auto-generated list of the most recent changes|
-|RecentComments|Auto-genertated list of the most recent comments|
-|Recycle bin|Auto-generated list of 'deleted' tiddlers|
+|&lt;&lt;STETabInsert RecentChanges&gt;&gt;|Auto-generated list of the most recent changes|
+|&lt;&lt;STETabInsert RecentComments&gt;&gt;|Auto-genertated list of the most recent comments|
+|&lt;&lt;STETabInsert RecycleBin&gt;&gt;|Auto-generated list of 'deleted' tiddlers|
 |&lt;&lt;STETabInsert SearchHistory&gt;&gt;|Presents your search history using ~SearchHistoryScript (LoD)|
 |&lt;&lt;STETabInsert SearchHistoryScript&gt;&gt;|Script for presenting your search history (LoD)|
 |&lt;&lt;STETabInsert SearchPanel&gt;&gt;|Invokes the search macro to display the search dialog|
@@ -75,7 +76,7 @@ config.macros.STETabInsert = {
 |&lt;&lt;STETabInsert UserMenu&gt;&gt;|Appears at the top of the right sidebar when (having logged in) you click your username|
 |&lt;&lt;STETabInsert UserProfile&gt;&gt;|Dialog for defining personal settings|
 |&lt;&lt;STETabInsert ViewOnlyTemplate&gt;&gt;|The HTML template in this shadow tiddler is used for presenting system dialogs|
-|&lt;&lt;STETabInsert ViewTemplate&gt;&gt;|The HTML template in this shadow tiddler determines how tiddlers look|
+|&lt;&lt;STETabInsert ViewTemplate&gt;&gt;|This special tiddler controls the default presentation of tiddlers|
 &lt;hr&gt;
 (*: SiteTitle &amp; SiteSubtitle: use these if you want the changes to be versioned, otherwise set these via the PageProperties)
 </pre>
